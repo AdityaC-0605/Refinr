@@ -1,0 +1,79 @@
+.container {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: var(--space-md) var(--space-lg);
+    font-family: var(--font-mono), var(--font-sans);
+    font-size: 0.875rem;
+    line-height: 1.8;
+}
+
+.line {
+    display: block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.added {
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--accent-emerald);
+    border-left: 3px solid var(--accent-emerald);
+    padding-left: 12px;
+}
+
+.removed {
+    background: rgba(244, 63, 94, 0.1);
+    color: var(--accent-rose);
+    text-decoration: line-through;
+    opacity: 0.7;
+    border-left: 3px solid var(--accent-rose);
+    padding-left: 12px;
+}
+
+.unchanged {
+    color: var(--text-secondary);
+    opacity: 0.6;
+}
+
+.diffHeader {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding-bottom: var(--space-sm);
+    margin-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--border-subtle);
+    font-family: var(--font-sans);
+}
+
+.diffLegendItem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+}
+
+.legendDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.legendDotAdded {
+    background: var(--accent-emerald);
+}
+
+.legendDotRemoved {
+    background: var(--accent-rose);
+}
+
+.noDiff {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2xl);
+    color: var(--text-tertiary);
+    font-size: 0.875rem;
+    font-family: var(--font-sans);
+}
