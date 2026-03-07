@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 import { buildSystemPrompt, buildUserPrompt, HumanizeSettings } from '@/lib/prompt';
 import { sanitizeInput, validateInput } from '@/lib/sanitize';
 
@@ -23,6 +23,30 @@ function checkRateLimit(ip: string): boolean {
 
     entry.count++;
     return true;
+}
+
+// Models to try in order — each has its own separate free-tier quota
+const MODELS_TO_TRY = [
+    'gemini-2.5-flash-lite',
+    'gemini-2.5-flash',
+    'gemini-2.0-flash-lite',
+    'gemini-2.0-flash',
+];
+
+// Check if an error is retryable (quota, rate limit, temporary unavailability, or model not found)
+function isRetryableError(msg: string): boolean {
+    return (
+        msg.includes('429') ||
+        msg.includes('503') ||
+        msg.includes('500') ||
+        msg.includes('404') ||
+        msg.includes('quota') ||
+        msg.includes('RESOURCE_EXHAUSTED') ||
+        msg.includes('Service Unavailable') ||
+        msg.includes('high demand') ||
+        msg.includes('not found') ||
+        msg.includes('not supported')
+    );
 }
 
 export async function POST(request: NextRequest) {
@@ -70,16 +94,48 @@ export async function POST(request: NextRequest) {
         const systemPrompt = buildSystemPrompt(settings);
         const userPrompt = buildUserPrompt(cleanText);
 
-        // Call Gemini API
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({
-            model: 'gemini-2.0-flash',
-            systemInstruction: systemPrompt,
-        });
+        // Initialize the new Google GenAI SDK
+        const ai = new GoogleGenAI({ apiKey });
 
-        const result = await model.generateContent(userPrompt);
-        const response = result.response;
-        const responseText = response.text();
+        // Try models in order until one succeeds
+        let responseText = '';
+        let lastError: unknown = null;
+
+        for (const modelName of MODELS_TO_TRY) {
+            try {
+                const response = await ai.models.generateContent({
+                    model: modelName,
+                    contents: userPrompt,
+                    config: {
+                        systemInstruction: systemPrompt,
+                    },
+                });
+
+                responseText = response.text ?? '';
+                if (!responseText) {
+                    throw new Error('Empty response from model');
+                }
+
+                lastError = null;
+                console.log(`✓ Successfully used model: ${modelName}`);
+                break; // success
+            } catch (err) {
+                lastError = err;
+                const msg = err instanceof Error ? err.message : String(err);
+
+                if (isRetryableError(msg)) {
+                    console.warn(`⚠ Model ${modelName} unavailable: ${msg.slice(0, 100)}`);
+                    continue; // try next model
+                }
+
+                // Non-retryable error — stop immediately
+                throw err;
+            }
+        }
+
+        if (lastError) {
+            throw lastError; // all models failed
+        }
 
         // Parse the JSON response from Gemini
         let parsed: { edited_text: string; change_summary: string[] };
@@ -127,10 +183,17 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        if (message.includes('RESOURCE_EXHAUSTED') || message.includes('quota')) {
+        if (message.includes('RESOURCE_EXHAUSTED') || message.includes('quota') || message.includes('429')) {
             return NextResponse.json(
-                { error: 'API quota exceeded. Please try again later or check your Gemini API quota.' },
+                { error: 'All model quotas exhausted. Please wait a few minutes and try again.' },
                 { status: 429 }
+            );
+        }
+
+        if (message.includes('503') || message.includes('high demand') || message.includes('Service Unavailable')) {
+            return NextResponse.json(
+                { error: 'All models are currently experiencing high demand. Please try again in a moment.' },
+                { status: 503 }
             );
         }
 
