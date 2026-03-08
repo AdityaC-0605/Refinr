@@ -1,10 +1,13 @@
 'use client';
 
-import type { Tone, Intensity, VocabLevel, HumanizeSettings } from '@/lib/prompt';
+import PresetSelector from './PresetSelector';
+import type { Tone, Intensity, VocabLevel, RewriteIntent, HumanizeSettings, RewritePreset } from '@/lib/prompt';
 import styles from './ToneSelector.module.css';
 
 interface ToneSelectorProps {
+    preset: RewritePreset;
     settings: HumanizeSettings;
+    onPresetChange: (preset: RewritePreset) => void;
     onChange: (settings: HumanizeSettings) => void;
     onHumanize: () => void;
     loading: boolean;
@@ -31,8 +34,46 @@ const VOCAB_LEVELS: { value: VocabLevel; label: string }[] = [
     { value: 'advanced', label: 'Advanced' },
 ];
 
+const REWRITE_INTENTS: { value: RewriteIntent; label: string }[] = [
+    { value: 'humanize', label: 'Humanize' },
+    { value: 'clarify', label: 'Clarify' },
+    { value: 'tighten', label: 'Tighten' },
+    { value: 'concise', label: 'Concise' },
+    { value: 'persuasive', label: 'Persuasive' },
+];
+
+const TONE_NOTES: Record<Tone, string> = {
+    formal: 'Structured, precise, and suitable for official writing or reports.',
+    professional: 'Clean, polished phrasing for workplace communication and presentations.',
+    conversational: 'Relaxed and natural, like a confident human speaker.',
+    friendly: 'Warm, engaging copy with more approachability and softness.',
+    academic: 'Measured, scholarly language with analytical restraint.',
+};
+
+const INTENSITY_NOTES: Record<Intensity, string> = {
+    light: 'Small adjustments that preserve most wording and structure.',
+    moderate: 'Balanced editing for stronger rhythm and clearer phrasing.',
+    thorough: 'A deeper pass that can reshape structure for much better flow.',
+};
+
+const VOCAB_NOTES: Record<VocabLevel, string> = {
+    simplified: 'Shorter, clearer wording for broad readability.',
+    standard: 'A balanced vocabulary that feels polished without being dense.',
+    advanced: 'Richer language for expert, academic, or high-context writing.',
+};
+
+const INTENT_NOTES: Record<RewriteIntent, string> = {
+    humanize: 'Reduce robotic phrasing and make the draft sound more natural.',
+    clarify: 'Improve readability, logic, and flow so the message lands faster.',
+    tighten: 'Sharpen the writing by trimming softness and unnecessary drag.',
+    concise: 'Compress the draft and remove bulk while keeping the main point intact.',
+    persuasive: 'Add conviction and momentum without tipping into hype.',
+};
+
 export default function ToneSelector({
+    preset,
     settings,
+    onPresetChange,
     onChange,
     onHumanize,
     loading,
@@ -42,11 +83,33 @@ export default function ToneSelector({
         onChange({ ...settings, ...partial });
     };
 
+    const selectedTone = TONES.find(t => t.value === settings.tone);
+
     return (
         <div className={styles.container}>
+            <PresetSelector preset={preset} onChange={onPresetChange} />
+
+            <div className={styles.section}>
+                <span className={styles.sectionLabel}>Rewrite intent</span>
+                <p className={styles.sectionInfo}>{INTENT_NOTES[settings.rewriteIntent]}</p>
+                <div className={styles.sliderTrack}>
+                    {REWRITE_INTENTS.map(intent => (
+                        <button
+                            key={intent.value}
+                            type="button"
+                            className={`${styles.sliderOption} ${settings.rewriteIntent === intent.value ? styles.sliderOptionActive : ''}`}
+                            onClick={() => update({ rewriteIntent: intent.value })}
+                        >
+                            {intent.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
             {/* Tone */}
             <div className={styles.section}>
                 <span className={styles.sectionLabel}>Tone</span>
+                <p className={styles.sectionInfo}>{TONE_NOTES[settings.tone]}</p>
                 <div className={styles.toneGrid}>
                     {TONES.map(t => (
                         <button
@@ -64,6 +127,7 @@ export default function ToneSelector({
             {/* Intensity */}
             <div className={styles.section}>
                 <span className={styles.sectionLabel}>Intensity</span>
+                <p className={styles.sectionInfo}>{INTENSITY_NOTES[settings.intensity]}</p>
                 <div className={styles.sliderTrack}>
                     {INTENSITIES.map(i => (
                         <button
@@ -81,6 +145,7 @@ export default function ToneSelector({
             {/* Vocabulary */}
             <div className={styles.section}>
                 <span className={styles.sectionLabel}>Vocabulary</span>
+                <p className={styles.sectionInfo}>{VOCAB_NOTES[settings.vocabLevel]}</p>
                 <div className={styles.vocabToggle}>
                     {VOCAB_LEVELS.map(v => (
                         <button
@@ -105,6 +170,25 @@ export default function ToneSelector({
                     onChange={e => update({ preserveLength: e.target.checked })}
                     aria-label="Preserve text length"
                 />
+            </div>
+
+            <div className={styles.previewPanel}>
+                <div className={styles.previewHeader}>
+                    <span className={styles.previewEyebrow}>Current direction</span>
+                    <span className={styles.previewBadge}>
+                        {selectedTone?.emoji} {selectedTone?.label}
+                    </span>
+                </div>
+                <p className={styles.previewText}>
+                    {INTENT_NOTES[settings.rewriteIntent]} {INTENSITY_NOTES[settings.intensity]} {VOCAB_NOTES[settings.vocabLevel]}
+                </p>
+                <div className={styles.previewMeta}>
+                    <span>{preset === 'none' ? 'No preset' : preset.replace('-', ' ')}</span>
+                    <span>{settings.rewriteIntent}</span>
+                    <span>{settings.intensity}</span>
+                    <span>{settings.vocabLevel}</span>
+                    <span>{settings.preserveLength ? 'Length locked' : 'Length flexible'}</span>
+                </div>
             </div>
 
             {/* Humanize Button */}

@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import AmbientBackdrop from '@/components/AmbientBackdrop';
+import AuthProvider from '@/components/AuthProvider';
+import PageTransition from '@/components/PageTransition';
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,6 +21,10 @@ export const metadata: Metadata = {
             "Ethical AI writing assistant. Improve readability and style, not bypass detection.",
         type: "website",
     },
+    icons: {
+        icon: '/icon.svg',
+        apple: '/apple-icon.svg',
+    },
 };
 
 export default function RootLayout({
@@ -28,7 +35,10 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body>
-                {children}
+                <AuthProvider>
+                    <AmbientBackdrop />
+                    <PageTransition>{children}</PageTransition>
+                </AuthProvider>
             </body>
         </html>
     );

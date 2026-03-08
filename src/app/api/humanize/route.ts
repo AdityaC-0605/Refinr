@@ -1,23 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-import { buildSystemPrompt, buildUserPrompt, HumanizeSettings } from '@/lib/prompt';
+import {
+    buildAlternativeRewriteSystemPrompt,
+    buildAlternativeRewriteUserPrompt,
+    buildPolishSystemPrompt,
+    buildPolishUserPrompt,
+    buildSystemPrompt,
+    buildUserPrompt,
+    HumanizeSettings,
+    RewritePreset,
+} from '@/lib/prompt';
+import {
+    DEFAULT_HUMANIZE_SETTINGS,
+    DEFAULT_REWRITE_PRESET,
+    isValidHumanizeSettings,
+    isValidRewritePreset,
+    RATE_LIMIT_REQUESTS,
+    RATE_LIMIT_WINDOW_MS,
+} from '@/lib/config';
+import {
+    assessRewriteQuality,
+    chooseBetterRewrite,
+    getClientIpFromHeaders,
+    isRetryableError,
+    MODELS_TO_TRY,
+    parseHumanizeResponse,
+    shouldGenerateAlternativeRewrite,
+    shouldRunPolishPassWithSettings,
+} from '@/lib/humanize';
 import { sanitizeInput, validateInput } from '@/lib/sanitize';
 
 // Simple in-memory rate limiter for MVP
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT = 10; // requests per hour
-const RATE_WINDOW = 60 * 60 * 1000; // 1 hour in ms
 
 function checkRateLimit(ip: string): boolean {
     const now = Date.now();
     const entry = rateLimitMap.get(ip);
 
     if (!entry || now > entry.resetAt) {
-        rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW });
+        rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
         return true;
     }
 
-    if (entry.count >= RATE_LIMIT) {
+    if (entry.count >= RATE_LIMIT_REQUESTS) {
         return false;
     }
 
@@ -25,34 +50,10 @@ function checkRateLimit(ip: string): boolean {
     return true;
 }
 
-// Models to try in order — each has its own separate free-tier quota
-const MODELS_TO_TRY = [
-    'gemini-2.5-flash-lite',
-    'gemini-2.5-flash',
-    'gemini-2.0-flash-lite',
-    'gemini-2.0-flash',
-];
-
-// Check if an error is retryable (quota, rate limit, temporary unavailability, or model not found)
-function isRetryableError(msg: string): boolean {
-    return (
-        msg.includes('429') ||
-        msg.includes('503') ||
-        msg.includes('500') ||
-        msg.includes('404') ||
-        msg.includes('quota') ||
-        msg.includes('RESOURCE_EXHAUSTED') ||
-        msg.includes('Service Unavailable') ||
-        msg.includes('high demand') ||
-        msg.includes('not found') ||
-        msg.includes('not supported')
-    );
-}
-
 export async function POST(request: NextRequest) {
     try {
         // Rate limiting
-        const ip = request.headers.get('x-forwarded-for') || 'anonymous';
+        const ip = getClientIpFromHeaders(request.headers);
         if (!checkRateLimit(ip)) {
             return NextResponse.json(
                 { error: 'Rate limit exceeded. Please try again later.' },
@@ -61,15 +62,50 @@ export async function POST(request: NextRequest) {
         }
 
         // Parse body
-        const body = await request.json();
-        const { text, settings } = body as { text: string; settings: HumanizeSettings };
+        let body: unknown;
 
-        if (!text) {
+        try {
+            body = await request.json();
+        } catch {
+            return NextResponse.json(
+                { error: 'Invalid JSON body.' },
+                { status: 400 }
+            );
+        }
+
+        const { text, settings, preset } = (body ?? {}) as {
+            text?: unknown;
+            settings?: unknown;
+            preset?: unknown;
+        };
+
+        if (typeof text !== 'string' || text.trim().length === 0) {
             return NextResponse.json(
                 { error: 'Text is required.' },
                 { status: 400 }
             );
         }
+
+        if (settings !== undefined && !isValidHumanizeSettings(settings)) {
+            return NextResponse.json(
+                { error: 'Invalid settings provided.' },
+                { status: 400 }
+            );
+        }
+
+        if (preset !== undefined && !isValidRewritePreset(preset)) {
+            return NextResponse.json(
+                { error: 'Invalid preset provided.' },
+                { status: 400 }
+            );
+        }
+
+        const safeSettings: HumanizeSettings = isValidHumanizeSettings(settings)
+            ? settings
+            : DEFAULT_HUMANIZE_SETTINGS;
+        const safePreset: RewritePreset = isValidRewritePreset(preset)
+            ? preset
+            : DEFAULT_REWRITE_PRESET;
 
         // Sanitize and validate
         const cleanText = sanitizeInput(text);
@@ -91,8 +127,8 @@ export async function POST(request: NextRequest) {
         }
 
         // Build prompt
-        const systemPrompt = buildSystemPrompt(settings);
-        const userPrompt = buildUserPrompt(cleanText);
+        const systemPrompt = buildSystemPrompt(safeSettings, safePreset);
+        const userPrompt = buildUserPrompt(cleanText, safePreset, safeSettings);
 
         // Initialize the new Google GenAI SDK
         const ai = new GoogleGenAI({ apiKey });
@@ -137,33 +173,94 @@ export async function POST(request: NextRequest) {
             throw lastError; // all models failed
         }
 
-        // Parse the JSON response from Gemini
-        let parsed: { edited_text: string; change_summary: string[] };
+        let parsed = parseHumanizeResponse(responseText, cleanText);
+        let assessment = assessRewriteQuality(cleanText, parsed.edited_text, {
+            settings: safeSettings,
+        });
 
-        try {
-            // Try to extract JSON from the response (Gemini sometimes wraps in markdown)
-            let jsonStr = responseText;
+        if (shouldGenerateAlternativeRewrite(cleanText, parsed.edited_text, safeSettings)) {
+            for (const modelName of MODELS_TO_TRY) {
+                try {
+                    const altResponse = await ai.models.generateContent({
+                        model: modelName,
+                        contents: buildAlternativeRewriteUserPrompt({
+                            originalText: cleanText,
+                            firstDraft: parsed.edited_text,
+                            issues: assessment.issues.slice(0, 4),
+                        }, safePreset, safeSettings),
+                        config: {
+                            systemInstruction: buildAlternativeRewriteSystemPrompt(safeSettings, safePreset),
+                        },
+                    });
 
-            // Remove markdown code fences if present
-            const jsonMatch = responseText.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
-            if (jsonMatch) {
-                jsonStr = jsonMatch[1];
+                    const preferredText = chooseBetterRewrite(
+                        cleanText,
+                        parsed.edited_text,
+                        altResponse.text ?? '',
+                        safeSettings
+                    );
+
+                    if (preferredText !== parsed.edited_text) {
+                        parsed = {
+                            edited_text: preferredText,
+                            change_summary: parsed.change_summary,
+                        };
+                        assessment = assessRewriteQuality(cleanText, parsed.edited_text, {
+                            settings: safeSettings,
+                        });
+                    }
+                    break;
+                } catch (err) {
+                    const msg = err instanceof Error ? err.message : String(err);
+
+                    if (isRetryableError(msg)) {
+                        continue;
+                    }
+
+                    break;
+                }
             }
+        }
 
-            parsed = JSON.parse(jsonStr.trim());
+        if (shouldRunPolishPassWithSettings(cleanText, parsed.edited_text, safeSettings)) {
+            for (const modelName of MODELS_TO_TRY) {
+                try {
+                    const polishResponse = await ai.models.generateContent({
+                        model: modelName,
+                        contents: buildPolishUserPrompt({
+                            originalText: cleanText,
+                            candidateText: parsed.edited_text,
+                            issues: assessment.issues.slice(0, 4),
+                        }, safeSettings),
+                        config: {
+                            systemInstruction: buildPolishSystemPrompt(safeSettings, safePreset),
+                        },
+                    });
 
-            if (!parsed.edited_text) {
-                throw new Error('Missing edited_text in response');
+                    const preferredText = chooseBetterRewrite(
+                        cleanText,
+                        parsed.edited_text,
+                        polishResponse.text ?? '',
+                        safeSettings
+                    );
+
+                    if (preferredText !== parsed.edited_text) {
+                        parsed = {
+                            edited_text: preferredText,
+                            change_summary: parsed.change_summary,
+                        };
+                    }
+                    break;
+                } catch (err) {
+                    const msg = err instanceof Error ? err.message : String(err);
+
+                    if (isRetryableError(msg)) {
+                        continue;
+                    }
+
+                    break;
+                }
             }
-            if (!Array.isArray(parsed.change_summary)) {
-                parsed.change_summary = [parsed.change_summary || 'Text was edited for improved readability'];
-            }
-        } catch {
-            // If JSON parsing fails, use the raw response as the edited text
-            parsed = {
-                edited_text: responseText,
-                change_summary: ['Text was edited for improved readability and natural flow'],
-            };
         }
 
         return NextResponse.json({

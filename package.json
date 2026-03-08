@@ -6,16 +6,24 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint . --max-warnings=0",
+    "test": "node --no-warnings --experimental-strip-types --experimental-specifier-resolution=node --test src/lib/*.test.ts",
+    "eval:humanizer": "node --no-warnings --experimental-strip-types --experimental-specifier-resolution=node src/lib/humanize-eval.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed"
   },
   "dependencies": {
     "@google/genai": "^1.0.0",
+    "@opentelemetry/api": "^1.9.0",
     "diff": "^7.0.0",
+    "firebase": "^12.10.0",
+    "firebase-admin": "^13.7.0",
     "next": "^15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@types/diff": "^6.0.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",

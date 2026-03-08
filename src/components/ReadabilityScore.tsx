@@ -65,6 +65,9 @@ export default function ReadabilityScore({
                 <ScoreCard label="Before" result={originalScore} />
                 <ScoreCard label="After" result={editedScore} comparison={originalScore} />
             </div>
+            <p className={styles.contextNote}>
+                Readability is audience-dependent. Higher scores usually mean easier reading, but formal or academic writing may intentionally score lower.
+            </p>
             <div className={styles.statsRow}>
                 <div className={styles.stat}>
                     <span className={styles.statLabel}>Sentences</span>
