@@ -1,0 +1,185 @@
+.panel {
+    border-radius: 1.25rem;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    overflow: hidden;
+}
+
+.header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    padding: 0.95rem 1rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+}
+
+.title {
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+}
+
+.badgeWarning,
+.badgeSuccess,
+.badgeMuted {
+    padding: 0.4rem 0.7rem;
+    border-radius: var(--radius-full);
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.badgeWarning {
+    color: var(--accent-amber);
+    background: rgba(255, 179, 107, 0.12);
+}
+
+.badgeSuccess {
+    color: var(--accent-emerald);
+    background: rgba(73, 212, 160, 0.12);
+}
+
+.badgeMuted {
+    color: var(--text-tertiary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.body {
+    padding: 0 1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.mutedMessage {
+    color: var(--text-tertiary);
+    font-size: 0.86rem;
+    line-height: 1.7;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.toolbarButton,
+.issueButton {
+    min-height: 2.2rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: var(--radius-full);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-primary);
+    font-size: 0.72rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform var(--transition-base), border-color var(--transition-base), background var(--transition-base), opacity var(--transition-base);
+}
+
+.toolbarButton:hover,
+.issueButton:hover {
+    transform: translateY(-1px);
+    border-color: var(--border-accent);
+}
+
+.issueButton:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.issueList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.issueCard {
+    padding: 0.95rem;
+    border-radius: 1.1rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.issueHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7rem;
+    margin-bottom: 0.7rem;
+}
+
+.issueTag {
+    padding: 0.35rem 0.65rem;
+    border-radius: var(--radius-full);
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.issueTagSpelling {
+    color: var(--accent-amber);
+    background: rgba(255, 179, 107, 0.12);
+}
+
+.issueTagGrammar {
+    color: #ffd7df;
+    background: rgba(255, 122, 146, 0.14);
+}
+
+.issueTagStyle {
+    color: var(--accent-cyan);
+    background: rgba(116, 227, 255, 0.12);
+}
+
+.issueActions {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.snippet {
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    line-height: 1.75;
+}
+
+.snippetHighlight {
+    border-radius: 0.45rem;
+    padding: 0.05rem 0.15rem;
+    text-decoration-line: underline;
+    text-decoration-style: wavy;
+    text-decoration-thickness: 2px;
+}
+
+.snippetHighlightSpelling {
+    text-decoration-color: rgba(255, 179, 107, 0.9);
+}
+
+.snippetHighlightGrammar {
+    text-decoration-color: rgba(255, 122, 146, 0.92);
+}
+
+.snippetHighlightStyle {
+    text-decoration-color: rgba(116, 227, 255, 0.92);
+}
+
+.message {
+    margin-top: 0.7rem;
+    color: var(--text-primary);
+    font-size: 0.86rem;
+    line-height: 1.65;
+}
+
+.suggestion {
+    margin-top: 0.45rem;
+    color: var(--text-tertiary);
+    font-size: 0.8rem;
+}

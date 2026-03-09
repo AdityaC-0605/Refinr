@@ -1,0 +1,46 @@
+.backdrop {
+    --ambient-x: 50%;
+    --ambient-y: 40%;
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.pointerGlow,
+.mesh,
+.noise {
+    position: absolute;
+    inset: 0;
+}
+
+.pointerGlow {
+    background:
+        radial-gradient(circle at var(--ambient-x) var(--ambient-y), rgba(255, 179, 107, 0.14), transparent 16%),
+        radial-gradient(circle at calc(var(--ambient-x) + 10%) calc(var(--ambient-y) - 12%), rgba(116, 227, 255, 0.12), transparent 18%);
+    transition: background-position 140ms ease;
+}
+
+.mesh {
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    background-size: 72px 72px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.3), transparent 85%);
+    opacity: 0.28;
+}
+
+.noise {
+    background:
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.025), transparent 24%),
+        radial-gradient(circle at 80% 60%, rgba(255, 255, 255, 0.02), transparent 24%);
+    mix-blend-mode: screen;
+    opacity: 0.42;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pointerGlow {
+        display: none;
+    }
+}

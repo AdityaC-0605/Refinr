@@ -1,0 +1,66 @@
+.footer {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    width: min(1480px, calc(100% - 3rem));
+    margin: 0 auto 2rem;
+    padding: 1.25rem 1.4rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-tertiary);
+}
+
+.brandBlock {
+    max-width: 34rem;
+}
+
+.brandLabel {
+    display: inline-flex;
+    margin-bottom: 0.35rem;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+.brandText {
+    font-size: 0.84rem;
+    line-height: 1.7;
+}
+
+.linkRow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.9rem;
+}
+
+.link,
+.linkMeta {
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.link {
+    color: var(--text-secondary);
+    transition: color var(--transition-base), transform var(--transition-base);
+}
+
+.link:hover {
+    color: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+.linkMeta {
+    color: var(--accent-emerald);
+}
+
+@media (max-width: 768px) {
+    .footer {
+        width: min(100% - 1rem, 1480px);
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 1.4rem;
+    }
+}

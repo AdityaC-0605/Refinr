@@ -1,0 +1,59 @@
+.shell {
+    position: relative;
+    min-height: 100vh;
+}
+
+.stage {
+    animation: pageEnter 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.routeBeam {
+    position: fixed;
+    inset: 0 auto auto 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(255, 179, 107, 0.95), rgba(116, 227, 255, 0.95), transparent);
+    transform-origin: left center;
+    animation: routeSweep 780ms cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+    z-index: 200;
+    box-shadow: 0 0 24px rgba(116, 227, 255, 0.35);
+}
+
+@keyframes pageEnter {
+    from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.992);
+        filter: blur(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes routeSweep {
+    0% {
+        opacity: 0;
+        transform: scaleX(0.1);
+    }
+
+    30% {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scaleX(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .stage,
+    .routeBeam {
+        animation: none;
+    }
+}
