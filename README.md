@@ -1,20 +1,20 @@
 # Refinr
 
-Refinr is an ethical AI writing assistant that transforms stiff, robotic AI-generated text into natural, professional prose. Unlike tools designed to "bypass" AI detectors, Refinr focuses on transparency and legitimate writing assistance — improving readability, sentence variety, flow, and tone.
+Refinr is an AI writing assistant designed to transform stiff, robotic AI-generated text into natural, professional prose. Instead of focusing on "bypassing" AI detectors, Refinr prioritizes genuine writing assistance by improving readability, sentence variety, flow, and tone.
 
 ## Features
 
-- 🛡️ **Ethics-First Design**: Built to polish text, not hide its origins.
-- ✏️ **Split-Pane Editor**: Real-time side-by-side view with word counters and text file uploads.
-- 🎛️ **Granular Controls**: Select from 5 tones (Formal, Professional, Conversational, Friendly, Academic), 3 editing intensities, and 3 vocabulary levels.
-- 📝 **Format Presets**: Shape your output specifically for Emails, Blog Posts, Essays, or LinkedIn Posts.
-- ⚡ **Real-Time Streaming**: Watch your refined text generate in real-time with streaming AI responses.
-- 🔍 **Word-Level Diff & Explanations**: See exactly what changed with color-coded diffs, and read AI explanations for why each sentence was modified.
-- ✅ **Grammar Check**: Catch and resolve spelling, grammar, and stylistic errors with one-click inline replacements.
-- 🎯 **Tone Consistency Check**: Automatically flag sentences that stray from your target tone, with an option to selectively re-refine them.
-- 🔐 **Accounts & Document Storage**: Sign in via Firebase Authentication to save, view, and manage your previous document revisions.
-- 📊 **Readability Scoring**: Compare before/after Flesch-Kincaid grade levels and scores.
-- 🎨 **Premium UI**: Dark theme with glassmorphism, responsive design, interactive 3D tilt effects, and smooth page transitions.
+- 🛡️ **Ethics-First Design**: Built to polish text, not to obscure its AI origins.
+- ✏️ **Split-Pane Editor**: Offers a real-time, side-by-side view with word counters and file upload capabilities.
+- 🎛️ **Granular Controls**: Customize your output with 5 tone options (Formal, Professional, Conversational, Friendly, Academic), 3 editing intensities, and 3 vocabulary levels.
+- 📝 **Format Presets**: Tailor your refined text for specific formats like Emails, Blog Posts, Essays, or LinkedIn Posts.
+- ⚡ **Real-Time Streaming**: Witness your refined text generate live with streaming AI responses.
+- 🔍 **Word-Level Diff & Explanations**: Clearly see every change with color-coded diffs and read AI-generated explanations for why sentences were modified.
+- ✅ **Grammar Check**: Quickly fix spelling, grammar, and stylistic errors with one-click inline replacements.
+- 🎯 **Tone Consistency Check**: Automatically highlights sentences that deviate from your chosen tone, allowing for selective re-refinement.
+- 🔐 **Accounts & Document Storage**: Use Firebase Authentication to sign in and save, view, and manage your past document revisions.
+- 📊 **Readability Scoring**: Compare Flesch-Kincaid grade levels and scores before and after refinement.
+- 🎨 **Premium UI**: Features a dark theme with glassmorphism, responsive design, interactive 3D tilt effects, and smooth page transitions.
 
 ## Tech Stack
 
@@ -58,17 +58,17 @@ Finally, start the development server:
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
 ## Usage
 
 1. **Sign In (Optional)**: Log in to save your documents and track revision history.
-2. **Input text**: Paste your AI-generated draft into the left pane (or upload a `.txt` file).
-3. **Choose settings**: Adjust the tone, intensity, vocabulary level, and format preset (e.g., Email, Essay) in the top toolbar.
-4. **Refine**: Click the "✨ Refine Text" button to start generating the streamed revision.
-5. **Review**: Examine the changes using the Diff view, read AI explanations for modified sentences, and check your readability score.
+2. **Input Text**: Paste your AI-generated draft into the left pane, or upload a `.txt` file.
+3. **Choose Settings**: Adjust the tone, intensity, vocabulary level, and format preset (e.g., Email, Essay) from the top toolbar.
+4. **Refine**: Click the "✨ Refine Text" button to begin the streamed revision.
+5. **Review**: Examine the changes in the Diff view, read AI explanations for modified sentences, and check your readability score.
 6. **Export / Save**: Copy your final polished text to your clipboard or save it to your account.
 
 ## Ethical Commitment
 
-Refinr is a transparent writing assistant. We proudly state what this tool does (improves sentence variety, adjusts tone, reduces filler words) and what it does *not* do (bypass AI detection tools or facilitate academic dishonesty). Let's make AI writing better, not just harder to find.
+Refinr operates as a transparent writing assistant. We clearly state what this tool does—improving sentence variety, adjusting tone, reducing filler words—and what it does *not* do, such as bypassing AI detection tools or facilitating academic dishonesty. Our goal is to enhance AI writing responsibly, not just make it harder to identify.
