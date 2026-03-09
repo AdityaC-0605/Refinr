@@ -307,6 +307,7 @@
 }
 
 @keyframes signalBlink {
+
     0%,
     100% {
         transform: scale(0.8);
@@ -320,6 +321,7 @@
 }
 
 @keyframes cursorBlink {
+
     0%,
     45% {
         opacity: 1;
@@ -348,4 +350,128 @@
     .outputText {
         font-size: 0.93rem;
     }
+}
+
+/* ─── Voice Match Badge ─── */
+
+.voiceMatchSection {
+    padding: 0.75rem 1.2rem 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.voiceMatchBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.voiceMatchBadge:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.voiceMatchIcon {
+    font-size: 0.9rem;
+}
+
+.voiceMatchLabel {
+    color: var(--text-secondary);
+}
+
+.voiceMatchValue {
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.voiceMatchQuality {
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+}
+
+.voiceMatchHigh {
+    border-color: rgba(73, 212, 160, 0.25);
+    background: rgba(73, 212, 160, 0.08);
+}
+
+.voiceMatchHigh .voiceMatchValue,
+.voiceMatchHigh .voiceMatchQuality {
+    color: #49d4a0;
+}
+
+.voiceMatchMid {
+    border-color: rgba(108, 140, 255, 0.25);
+    background: rgba(108, 140, 255, 0.08);
+}
+
+.voiceMatchMid .voiceMatchValue,
+.voiceMatchMid .voiceMatchQuality {
+    color: #8fadff;
+}
+
+.voiceMatchLow {
+    border-color: rgba(240, 160, 75, 0.25);
+    background: rgba(240, 160, 75, 0.08);
+}
+
+.voiceMatchLow .voiceMatchValue,
+.voiceMatchLow .voiceMatchQuality {
+    color: #f0a04b;
+}
+
+.voiceBreakdown {
+    margin-top: 0.75rem;
+    padding: 0.85rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    animation: fadeIn 0.2s ease-out;
+}
+
+.voiceBreakdownRow {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+}
+
+.voiceBreakdownRow:last-child {
+    margin-bottom: 0;
+}
+
+.voiceBreakdownMetric {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    min-width: 120px;
+    flex-shrink: 0;
+}
+
+.voiceBreakdownTrack {
+    flex: 1;
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+}
+
+.voiceBreakdownFill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #5b7cfa 0%, #8b5cf6 100%);
+    transition: width 0.4s ease;
+}
+
+.voiceBreakdownValue {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    min-width: 28px;
+    text-align: right;
+    font-weight: 600;
 }

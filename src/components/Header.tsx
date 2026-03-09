@@ -75,6 +75,15 @@ export default function Header() {
                         My Documents
                     </Link>
                 )}
+                {user && (
+                    <Link
+                        href="/voice"
+                        className={`${styles.navLink} ${pathname.startsWith('/voice') ? styles.navLinkActive : ''}`}
+                        onClick={() => setMobileOpen(false)}
+                    >
+                        Voice DNA
+                    </Link>
+                )}
                 <div className={styles.headerActions}>
                     <div className={styles.ethicsBadge}>
                         <span>🛡️</span>

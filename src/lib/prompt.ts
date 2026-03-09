@@ -528,14 +528,18 @@ TEXT TO EDIT:
 ${text}`;
 }
 
-export function buildStreamingSystemPrompt(settings: HumanizeSettings, preset: RewritePreset = 'none'): string {
+export function buildStreamingSystemPrompt(settings: HumanizeSettings, preset: RewritePreset = 'none', voicePromptFragment?: string): string {
+    const voiceDnaBlock = voicePromptFragment
+        ? `\n## VOICE DNA — AUTHOR'S PERSONAL STYLE\nVoice DNA takes priority over generic tone preset. Preserve the author's voice above all else.\n${voicePromptFragment}\n`
+        : '';
+
     return `You are an expert editorial assistant specializing in improving the readability and natural flow of text. Your role is to transform stiff, formulaic, or awkward prose into clear, engaging, natural-sounding writing.
 
 ## YOUR ROLE
 - You are a writing editor, NOT a detection evasion tool
 - Your goal is to improve readability and quality, never to make text "undetectable"
 - Keep the meaning intact while making the writing feel more natural and polished
-
+${voiceDnaBlock}
 ## EDITING GUIDELINES
 
 ### Tone

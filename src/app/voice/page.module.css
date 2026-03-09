@@ -1,0 +1,510 @@
+.voicePage {
+    min-height: 100vh;
+    padding: 2rem 1.5rem 4rem;
+    max-width: 860px;
+    margin: 0 auto;
+}
+
+/* ─── Header ─── */
+
+.pageTitle {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.35rem;
+}
+
+.dnaIcon {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+}
+
+.pageSubtext {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    max-width: 640px;
+    margin-bottom: 2rem;
+}
+
+/* ─── Upload Zone ─── */
+
+.uploadZone {
+    border: 2px dashed rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    transition: border-color 0.2s, background 0.2s;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+}
+
+.uploadZone:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.uploadZoneDragOver {
+    border-color: var(--accent-primary, #6c8cff);
+    background: rgba(108, 140, 255, 0.08);
+}
+
+.uploadIcon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.uploadLabel {
+    display: block;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+}
+
+.uploadBrowseBtn {
+    display: inline-block;
+    padding: 0.45rem 1.15rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.uploadBrowseBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.hiddenInput {
+    display: none;
+}
+
+/* ─── Paste Toggle ─── */
+
+.pasteToggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.pasteToggleBtn {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 0.4rem 0.85rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.pasteToggleBtn:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-primary);
+}
+
+.pasteToggleBtnActive {
+    background: rgba(108, 140, 255, 0.12);
+    border-color: rgba(108, 140, 255, 0.3);
+    color: var(--text-primary);
+}
+
+.pasteArea {
+    width: 100%;
+    min-height: 140px;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-primary);
+    font-size: 0.88rem;
+    font-family: inherit;
+    line-height: 1.55;
+    resize: vertical;
+    margin-bottom: 0.75rem;
+}
+
+.pasteArea::placeholder {
+    color: var(--text-muted, rgba(255, 255, 255, 0.3));
+}
+
+.addPasteBtn {
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(108, 140, 255, 0.3);
+    background: rgba(108, 140, 255, 0.1);
+    color: var(--text-primary);
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.addPasteBtn:hover {
+    background: rgba(108, 140, 255, 0.2);
+}
+
+.addPasteBtn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ─── Sample Cards ─── */
+
+.sampleList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.sampleCard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.1rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.sampleInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.sampleName {
+    font-size: 0.88rem;
+    color: var(--text-primary);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sampleMeta {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.sampleWarning {
+    font-size: 0.75rem;
+    color: #f0a04b;
+    margin-top: 0.1rem;
+}
+
+.sampleRemoveBtn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    transition: background 0.15s, color 0.15s;
+    flex-shrink: 0;
+}
+
+.sampleRemoveBtn:hover {
+    background: rgba(255, 80, 80, 0.12);
+    color: #f06060;
+}
+
+/* ─── Analyze Button ─── */
+
+.analyzeBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.85rem 1.5rem;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #5b7cfa 0%, #8b5cf6 100%);
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    margin-bottom: 2.5rem;
+}
+
+.analyzeBtn:hover:not(:disabled) {
+    opacity: 0.92;
+}
+
+.analyzeBtn:active:not(:disabled) {
+    transform: scale(0.985);
+}
+
+.analyzeBtn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.analyzeBtnSpinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spinVoice 0.6s linear infinite;
+}
+
+@keyframes spinVoice {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ─── Profile Card ─── */
+
+.profileSection {
+    margin-top: 2rem;
+}
+
+.profileSectionTitle {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.dnaCard {
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.personalityTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-bottom: 1rem;
+}
+
+.personalityTag {
+    padding: 0.3rem 0.7rem;
+    border-radius: 20px;
+    background: rgba(108, 140, 255, 0.14);
+    color: #8fadff;
+    font-size: 0.78rem;
+    font-weight: 500;
+}
+
+.toneDesc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    margin-bottom: 1rem;
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.statItem {
+    text-align: center;
+    padding: 0.65rem 0.5rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.statValue {
+    display: block;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.statLabel {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    margin-top: 0.15rem;
+}
+
+.habitsList {
+    list-style: disc;
+    padding-left: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.habitsList li {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 0.3rem;
+}
+
+.exampleBlock {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    font-family: 'SFMono-Regular', 'Menlo', 'Consolas', monospace;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.avoidTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+}
+
+.avoidTag {
+    padding: 0.25rem 0.6rem;
+    border-radius: 16px;
+    background: rgba(240, 80, 80, 0.1);
+    color: #e07070;
+    font-size: 0.75rem;
+}
+
+/* ─── Fingerprint Bars ─── */
+
+.fingerprintSection {
+    margin-top: 1.5rem;
+}
+
+.fingerprintTitle {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+}
+
+.fingerprintBar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.55rem;
+}
+
+.fingerprintLabel {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    min-width: 130px;
+    flex-shrink: 0;
+}
+
+.fingerprintTrack {
+    flex: 1;
+    height: 10px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+}
+
+.fingerprintFill {
+    height: 100%;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #5b7cfa 0%, #8b5cf6 100%);
+    transition: width 0.5s ease;
+}
+
+.fingerprintValue {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    min-width: 32px;
+    text-align: right;
+}
+
+/* ─── Profile Actions ─── */
+
+.profileActions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.profileActionBtn {
+    padding: 0.55rem 1.1rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.profileActionBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.profileActionBtnDanger {
+    border-color: rgba(240, 80, 80, 0.2);
+    color: #e07070;
+}
+
+.profileActionBtnDanger:hover {
+    background: rgba(240, 80, 80, 0.1);
+}
+
+.profileTimestamp {
+    font-size: 0.75rem;
+    color: var(--text-muted, rgba(255, 255, 255, 0.3));
+    margin-top: 0.75rem;
+}
+
+/* ─── Error / Info ─── */
+
+.errorMessage {
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    background: rgba(240, 80, 80, 0.1);
+    border: 1px solid rgba(240, 80, 80, 0.2);
+    color: #f06060;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+/* ─── Mobile ─── */
+
+@media (max-width: 640px) {
+    .voicePage {
+        padding: 1.25rem 1rem 3rem;
+    }
+
+    .pageTitle {
+        font-size: 1.35rem;
+    }
+
+    .statsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .fingerprintLabel {
+        min-width: 100px;
+        font-size: 0.72rem;
+    }
+
+    .profileActions {
+        flex-direction: column;
+    }
+}

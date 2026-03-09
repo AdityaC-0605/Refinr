@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
+import { cookies } from 'next/headers';
 import {
     buildAlternativeRewriteSystemPrompt,
     buildAlternativeRewriteUserPrompt,
@@ -32,6 +33,10 @@ import {
     StreamCompletePayload,
 } from '@/lib/humanize';
 import { sanitizeInput, validateInput } from '@/lib/sanitize';
+import { getSessionUserFromCookies } from '@/lib/firebase-admin';
+import { loadVoiceProfile } from '@/lib/voice-store';
+import { computeVoiceMatchScore } from '@/lib/voice-scoring';
+import type { VoiceMatchScore } from '@/lib/voice-types';
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
@@ -94,10 +99,11 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const { text, settings, preset } = (body ?? {}) as {
+        const { text, settings, preset, voiceDNAActive } = (body ?? {}) as {
             text?: unknown;
             settings?: unknown;
             preset?: unknown;
+            voiceDNAActive?: unknown;
         };
 
         if (typeof text !== 'string' || text.trim().length === 0) {
@@ -147,6 +153,32 @@ export async function POST(request: NextRequest) {
 
         const systemPrompt = buildStreamingSystemPrompt(safeSettings, safePreset);
         const userPrompt = buildStreamingUserPrompt(cleanText, safePreset, safeSettings);
+
+        // ── Voice DNA: load profile if active ──
+        let voicePromptFragment: string | undefined;
+        let voiceDNAUserId: string | undefined;
+
+        if (voiceDNAActive === true) {
+            try {
+                const cookieStore = await cookies();
+                const sessionUser = await getSessionUserFromCookies(cookieStore);
+
+                if (sessionUser) {
+                    voiceDNAUserId = sessionUser.uid;
+                    const profile = await loadVoiceProfile(sessionUser.uid);
+
+                    if (profile) {
+                        voicePromptFragment = profile.promptFragment;
+                    }
+                }
+            } catch {
+                // Silent failure — fall back to normal refinement
+            }
+        }
+
+        const finalSystemPrompt = voicePromptFragment
+            ? buildStreamingSystemPrompt(safeSettings, safePreset, voicePromptFragment)
+            : systemPrompt;
         const ai = new GoogleGenAI({ apiKey });
         const encoder = new TextEncoder();
 
@@ -162,7 +194,7 @@ export async function POST(request: NextRequest) {
                                 model: modelName,
                                 contents: userPrompt,
                                 config: {
-                                    systemInstruction: systemPrompt,
+                                    systemInstruction: finalSystemPrompt,
                                 },
                             });
 
@@ -289,10 +321,23 @@ export async function POST(request: NextRequest) {
                         }
                     }
 
-                    const payload: StreamCompletePayload = {
+                    const payload: StreamCompletePayload & { voiceMatchScore?: VoiceMatchScore } = {
                         edited_text: cleanedEditedText,
                         change_summary: generateChangeSummary(cleanText, cleanedEditedText),
                     };
+
+                    // ── Voice DNA: compute match score if active ──
+                    if (voiceDNAUserId && voicePromptFragment) {
+                        try {
+                            const profile = await loadVoiceProfile(voiceDNAUserId);
+
+                            if (profile) {
+                                payload.voiceMatchScore = computeVoiceMatchScore(cleanedEditedText, profile);
+                            }
+                        } catch {
+                            // Silent failure — omit score
+                        }
+                    }
 
                     controller.enqueue(
                         encoder.encode(createSseMessage('complete', payload))

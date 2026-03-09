@@ -133,6 +133,7 @@ async function streamRefinementRequest(payload: {
     text: string;
     settings: HumanizeSettings;
     preset: RewritePreset;
+    voiceDNAActive?: boolean;
     onChunk?: (text: string) => void;
 }): Promise<StreamCompletePayload> {
     const response = await fetch('/api/refine', {
@@ -341,6 +342,9 @@ export default function Home() {
     const [toneIssues, setToneIssues] = useState<ToneIssue[]>([]);
     const [reviewBaseEditedText, setReviewBaseEditedText] = useState<string | null>(null);
     const [reviewDecisions, setReviewDecisions] = useState<Partial<Record<number, ChangeDecision>>>({});
+    const [voiceDNAActive, setVoiceDNAActive] = useState(false);
+    const [voiceDNAAvailable, setVoiceDNAAvailable] = useState(false);
+    const [voiceMatchScore, setVoiceMatchScore] = useState<{ score: number; breakdown: Array<{ metric: string; score: number }> } | null>(null);
     const pendingSaveRef = useRef(false);
     const undoStackRef = useRef<UndoState[]>([]);
     const loadedDocumentIdRef = useRef<string | null>(null);
@@ -348,6 +352,22 @@ export default function Home() {
     const explanationRequestKeyRef = useRef<string | null>(null);
     const paragraphInputList = paragraphMode ? splitParagraphs(inputText) : [];
     const canRunParagraphMode = paragraphInputList.length > 0 && paragraphInputList.some(paragraph => paragraph.trim().length > 0);
+
+    // Fetch Voice DNA profile availability
+    useEffect(() => {
+        if (sessionReady && user) {
+            fetch('/api/voice/profile')
+                .then(res => res.json())
+                .then((data: { profile?: unknown }) => {
+                    setVoiceDNAAvailable(!!data.profile);
+                })
+                .catch(() => setVoiceDNAAvailable(false));
+        } else {
+            setVoiceDNAAvailable(false);
+            setVoiceDNAActive(false);
+        }
+    }, [sessionReady, user]);
+
     const diffComparisonEditedText = reviewBaseEditedText ?? result?.editedText ?? '';
     const reviewClusters = useMemo(
         () => originalText && diffComparisonEditedText
@@ -718,16 +738,18 @@ export default function Home() {
         loadedVersionIdRef.current = null;
         const requestSettings: HumanizeSettings = { ...settings };
         const requestPreset = preset;
+        setVoiceMatchScore(null);
 
         try {
             const finalPayload = await streamRefinementRequest({
                 text: clean,
                 settings: requestSettings,
                 preset: requestPreset,
+                voiceDNAActive,
                 onChunk: chunk => {
                     setStreamingText(prev => prev + chunk);
                 },
-            });
+            }) as StreamCompletePayload & { voiceMatchScore?: { score: number; breakdown: Array<{ metric: string; score: number }> } };
 
             setStreamingText(finalPayload.edited_text);
             setResult({
@@ -737,6 +759,9 @@ export default function Home() {
             resetReviewState(finalPayload.edited_text);
             setResultSettings(requestSettings);
             setResultPreset(requestPreset);
+            if (finalPayload.voiceMatchScore) {
+                setVoiceMatchScore(finalPayload.voiceMatchScore);
+            }
         } catch (err) {
             setStreamingText('');
             setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
@@ -1330,31 +1355,31 @@ export default function Home() {
 
                 <section className={styles.featureStrip}>
                     <InteractiveTilt className={styles.featureTilt} maxTilt={7}>
-                    <article className={styles.featureCard}>
-                        <span className={styles.featureIndex}>01</span>
-                        <h2 className={styles.featureTitle}>Sharper atmosphere</h2>
-                        <p className={styles.featureText}>
-                            A layered, cinematic workspace that feels like an editor’s instrument panel instead of a flat form.
-                        </p>
-                    </article>
+                        <article className={styles.featureCard}>
+                            <span className={styles.featureIndex}>01</span>
+                            <h2 className={styles.featureTitle}>Sharper atmosphere</h2>
+                            <p className={styles.featureText}>
+                                A layered, cinematic workspace that feels like an editor’s instrument panel instead of a flat form.
+                            </p>
+                        </article>
                     </InteractiveTilt>
                     <InteractiveTilt className={styles.featureTilt} maxTilt={7}>
-                    <article className={styles.featureCard}>
-                        <span className={styles.featureIndex}>02</span>
-                        <h2 className={styles.featureTitle}>Tighter review loop</h2>
-                        <p className={styles.featureText}>
-                            Output, diff, readability, and change notes stay visually connected so the rewrite feels inspectable.
-                        </p>
-                    </article>
+                        <article className={styles.featureCard}>
+                            <span className={styles.featureIndex}>02</span>
+                            <h2 className={styles.featureTitle}>Tighter review loop</h2>
+                            <p className={styles.featureText}>
+                                Output, diff, readability, and change notes stay visually connected so the rewrite feels inspectable.
+                            </p>
+                        </article>
                     </InteractiveTilt>
                     <InteractiveTilt className={styles.featureTilt} maxTilt={7}>
-                    <article className={styles.featureCard}>
-                        <span className={styles.featureIndex}>03</span>
-                        <h2 className={styles.featureTitle}>Ethics still front and center</h2>
-                        <p className={styles.featureText}>
-                            The UI feels more premium now, but the core position remains transparent editing, not evasion.
-                        </p>
-                    </article>
+                        <article className={styles.featureCard}>
+                            <span className={styles.featureIndex}>03</span>
+                            <h2 className={styles.featureTitle}>Ethics still front and center</h2>
+                            <p className={styles.featureText}>
+                                The UI feels more premium now, but the core position remains transparent editing, not evasion.
+                            </p>
+                        </article>
                     </InteractiveTilt>
                 </section>
 
@@ -1419,6 +1444,10 @@ export default function Home() {
                                 onHumanize={handleHumanize}
                                 loading={loading}
                                 disabled={isDisabled}
+                                voiceDNAAvailable={voiceDNAAvailable}
+                                voiceDNAActive={voiceDNAActive}
+                                onVoiceDNAToggle={setVoiceDNAActive}
+                                isLoggedIn={!!user}
                             />
                         </div>
                         <div className={styles.toolbarDesktop}>
@@ -1430,6 +1459,10 @@ export default function Home() {
                                 onHumanize={handleHumanize}
                                 loading={loading}
                                 disabled={isDisabled}
+                                voiceDNAAvailable={voiceDNAAvailable}
+                                voiceDNAActive={voiceDNAActive}
+                                onVoiceDNAToggle={setVoiceDNAActive}
+                                isLoggedIn={!!user}
                             />
                         </div>
                         {versionPreviewLabel && <div className={styles.toolbarOverlay} aria-hidden="true" />}
@@ -1451,11 +1484,11 @@ export default function Home() {
                         <div className={styles.inputPane}>
                             {paragraphMode ? (
                                 <div className={styles.paragraphEditor}>
-                                <div className={styles.paragraphEditorHeader}>
-                                    <div>
-                                        <span className={styles.paragraphEditorEyebrow}>Paragraph controls</span>
-                                        <p className={styles.paragraphEditorText}>
-                                            Refine individual blocks or run the whole document sequentially with a short delay between calls.
+                                    <div className={styles.paragraphEditorHeader}>
+                                        <div>
+                                            <span className={styles.paragraphEditorEyebrow}>Paragraph controls</span>
+                                            <p className={styles.paragraphEditorText}>
+                                                Refine individual blocks or run the whole document sequentially with a short delay between calls.
                                             </p>
                                         </div>
                                         <button
@@ -1510,82 +1543,83 @@ export default function Home() {
                             )}
                         </div>
                         <div className={styles.outputPane}>
-                        <OutputPanel
-                            text={paragraphMode ? (result?.editedText || '') : result?.editedText || streamingText}
-                            loading={loading}
-                            error={paragraphMode && paragraphInputList.length > 0 ? null : error}
-                            viewMode={viewMode}
-                            onViewModeChange={setViewMode}
-                            hasResult={paragraphMode ? paragraphInputList.length > 0 : !!result || streamingText.length > 0}
-                            showResultActions={paragraphMode ? !!result : undefined}
-                            onUseAsInput={handleUseResultAsInput}
-                            onSaveDocument={result ? handleSaveDocument : undefined}
-                            saveStatus={saveStatus}
-                            onUndo={handleUndo}
-                            canUndo={undoStackRef.current.length > 0}
-                            readOnlyPreview={!!versionPreviewLabel}
-                            outputContent={paragraphMode ? paragraphOutputContent : annotatedOutputContent}
-                            showStreamingCursor={loading && streamingText.length > 0}
-                            diffContent={
-                                result ? (
-                                    <div className={styles.diffPane}>
-                                        <div className={styles.diffControls}>
-                                            <div className={styles.diffControlsPrimary}>
-                                                <button
-                                                    type="button"
-                                                    className={`${styles.diffToggle} ${showExplanations ? styles.diffToggleActive : ''}`}
-                                                    onClick={() => setShowExplanations(prev => !prev)}
-                                                    aria-pressed={showExplanations}
-                                                >
-                                                    {showExplanations ? 'Hide Explanations' : 'Show Explanations'}
-                                                </button>
-                                                {showExplanations && explanationsLoading && !explanationsDisabled && (
-                                                    <span className={styles.diffStatus}>Generating explanations...</span>
+                            <OutputPanel
+                                text={paragraphMode ? (result?.editedText || '') : result?.editedText || streamingText}
+                                loading={loading}
+                                error={paragraphMode && paragraphInputList.length > 0 ? null : error}
+                                viewMode={viewMode}
+                                onViewModeChange={setViewMode}
+                                hasResult={paragraphMode ? paragraphInputList.length > 0 : !!result || streamingText.length > 0}
+                                showResultActions={paragraphMode ? !!result : undefined}
+                                onUseAsInput={handleUseResultAsInput}
+                                onSaveDocument={result ? handleSaveDocument : undefined}
+                                saveStatus={saveStatus}
+                                onUndo={handleUndo}
+                                canUndo={undoStackRef.current.length > 0}
+                                readOnlyPreview={!!versionPreviewLabel}
+                                outputContent={paragraphMode ? paragraphOutputContent : annotatedOutputContent}
+                                showStreamingCursor={loading && streamingText.length > 0}
+                                voiceMatchScore={voiceDNAActive ? voiceMatchScore : null}
+                                diffContent={
+                                    result ? (
+                                        <div className={styles.diffPane}>
+                                            <div className={styles.diffControls}>
+                                                <div className={styles.diffControlsPrimary}>
+                                                    <button
+                                                        type="button"
+                                                        className={`${styles.diffToggle} ${showExplanations ? styles.diffToggleActive : ''}`}
+                                                        onClick={() => setShowExplanations(prev => !prev)}
+                                                        aria-pressed={showExplanations}
+                                                    >
+                                                        {showExplanations ? 'Hide Explanations' : 'Show Explanations'}
+                                                    </button>
+                                                    {showExplanations && explanationsLoading && !explanationsDisabled && (
+                                                        <span className={styles.diffStatus}>Generating explanations...</span>
+                                                    )}
+                                                </div>
+                                                {reviewSummary.total > 0 && !versionPreviewLabel && (
+                                                    <div className={styles.reviewToolbar}>
+                                                        <span className={styles.reviewSummary}>
+                                                            {reviewSummary.accepted} kept · {reviewSummary.rejected} reverted · {reviewSummary.pending} pending
+                                                        </span>
+                                                        <div className={styles.reviewToolbarActions}>
+                                                            <button
+                                                                type="button"
+                                                                className={styles.reviewToolbarButton}
+                                                                onClick={() => handleReviewDecisionBatch('accepted')}
+                                                                disabled={reviewSummary.pending === 0 && reviewSummary.rejected === 0}
+                                                            >
+                                                                Keep all
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                className={styles.reviewToolbarButton}
+                                                                onClick={() => handleReviewDecisionBatch('rejected')}
+                                                                disabled={reviewSummary.pending === 0 && reviewSummary.accepted === 0}
+                                                            >
+                                                                Revert all
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                className={styles.reviewToolbarButton}
+                                                                onClick={handleResetReview}
+                                                                disabled={reviewSummary.accepted === 0 && reviewSummary.rejected === 0}
+                                                            >
+                                                                Reset review
+                                                            </button>
+                                                        </div>
+                                                    </div>
                                                 )}
                                             </div>
-                                            {reviewSummary.total > 0 && !versionPreviewLabel && (
-                                                <div className={styles.reviewToolbar}>
-                                                    <span className={styles.reviewSummary}>
-                                                        {reviewSummary.accepted} kept · {reviewSummary.rejected} reverted · {reviewSummary.pending} pending
-                                                    </span>
-                                                    <div className={styles.reviewToolbarActions}>
-                                                        <button
-                                                            type="button"
-                                                            className={styles.reviewToolbarButton}
-                                                            onClick={() => handleReviewDecisionBatch('accepted')}
-                                                            disabled={reviewSummary.pending === 0 && reviewSummary.rejected === 0}
-                                                        >
-                                                            Keep all
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className={styles.reviewToolbarButton}
-                                                            onClick={() => handleReviewDecisionBatch('rejected')}
-                                                            disabled={reviewSummary.pending === 0 && reviewSummary.accepted === 0}
-                                                        >
-                                                            Revert all
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className={styles.reviewToolbarButton}
-                                                            onClick={handleResetReview}
-                                                            disabled={reviewSummary.accepted === 0 && reviewSummary.rejected === 0}
-                                                        >
-                                                            Reset review
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            )}
+                                            <DiffView
+                                                original={originalText}
+                                                edited={diffComparisonEditedText}
+                                                explanations={showExplanations && !explanationsDisabled ? explanations : []}
+                                                showExplanations={showExplanations && !explanationsDisabled}
+                                                reviewDecisions={reviewDecisions}
+                                                onReviewDecision={!versionPreviewLabel ? handleReviewDecision : undefined}
+                                            />
                                         </div>
-                                        <DiffView
-                                            original={originalText}
-                                            edited={diffComparisonEditedText}
-                                            explanations={showExplanations && !explanationsDisabled ? explanations : []}
-                                            showExplanations={showExplanations && !explanationsDisabled}
-                                            reviewDecisions={reviewDecisions}
-                                            onReviewDecision={!versionPreviewLabel ? handleReviewDecision : undefined}
-                                        />
-                                    </div>
                                     ) : undefined
                                 }
                             />

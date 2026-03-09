@@ -7,6 +7,7 @@ Refinr is an AI writing assistant designed to transform stiff, robotic AI-genera
 - 🛡️ **Ethics-First Design**: Built to polish text, not to obscure its AI origins.
 - ✏️ **Split-Pane Editor**: Offers a real-time, side-by-side view with word counters and file upload capabilities.
 - 🎛️ **Granular Controls**: Customize your output with 5 tone options (Formal, Professional, Conversational, Friendly, Academic), 3 editing intensities, and 3 vocabulary levels.
+- 🧬 **Voice DNA**: Upload samples of your own writing to extract a personalized style fingerprint. Refinr analyzes 11 statistical metrics alongside qualitative habits, allowing the AI to refine text in your unique voice instead of a generic tone preset.
 - 📝 **Format Presets**: Tailor your refined text for specific formats like Emails, Blog Posts, Essays, or LinkedIn Posts.
 - ⚡ **Real-Time Streaming**: Witness your refined text generate live with streaming AI responses.
 - 🔍 **Word-Level Diff & Explanations**: Clearly see every change with color-coded diffs and read AI-generated explanations for why sentences were modified.
@@ -63,11 +64,12 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to see the a
 ## Usage
 
 1. **Sign In (Optional)**: Log in to save your documents and track revision history.
-2. **Input Text**: Paste your AI-generated draft into the left pane, or upload a `.txt` file.
-3. **Choose Settings**: Adjust the tone, intensity, vocabulary level, and format preset (e.g., Email, Essay) from the top toolbar.
-4. **Refine**: Click the "✨ Refine Text" button to begin the streamed revision.
-5. **Review**: Examine the changes in the Diff view, read AI explanations for modified sentences, and check your readability score.
-6. **Export / Save**: Copy your final polished text to your clipboard or save it to your account.
+2. **Setup Voice DNA**: Navigate to the Voice DNA page to upload 2-5 samples of your past writing to generate your unique voice profile.
+3. **Input Text**: Paste your AI-generated draft into the left pane, or upload a `.txt` file.
+4. **Choose Settings**: Adjust the tone, intensity, vocabulary level, and format preset (e.g., Email, Essay) from the top toolbar, or toggle Voice DNA to use your style fingerprint.
+5. **Refine**: Click the "✨ Refine Text" (or "🧬 Refine in My Voice") button to begin the streamed revision.
+6. **Review**: Examine the changes in the Diff view, read AI explanations for modified sentences, check your readability score, and view your Voice Match breakdown.
+7. **Export / Save**: Copy your final polished text to your clipboard or save it to your account.
 
 ## Ethical Commitment
 

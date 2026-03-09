@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import PresetSelector from './PresetSelector';
 import type { Tone, Intensity, VocabLevel, RewriteIntent, HumanizeSettings, RewritePreset } from '@/lib/prompt';
 import styles from './ToneSelector.module.css';
@@ -12,6 +13,10 @@ interface ToneSelectorProps {
     onHumanize: () => void;
     loading: boolean;
     disabled: boolean;
+    voiceDNAAvailable?: boolean;
+    voiceDNAActive?: boolean;
+    onVoiceDNAToggle?: (active: boolean) => void;
+    isLoggedIn?: boolean;
 }
 
 const TONES: { value: Tone; label: string; emoji: string }[] = [
@@ -78,117 +83,154 @@ export default function ToneSelector({
     onHumanize,
     loading,
     disabled,
+    voiceDNAAvailable = false,
+    voiceDNAActive = false,
+    onVoiceDNAToggle,
+    isLoggedIn = false,
 }: ToneSelectorProps) {
     const update = (partial: Partial<HumanizeSettings>) => {
         onChange({ ...settings, ...partial });
     };
 
     const selectedTone = TONES.find(t => t.value === settings.tone);
+    const controlsDimmed = voiceDNAActive;
 
     return (
         <div className={styles.container}>
-            <PresetSelector preset={preset} onChange={onPresetChange} />
-
-            <div className={styles.section}>
-                <span className={styles.sectionLabel}>Rewrite intent</span>
-                <p className={styles.sectionInfo}>{INTENT_NOTES[settings.rewriteIntent]}</p>
-                <div className={styles.sliderTrack}>
-                    {REWRITE_INTENTS.map(intent => (
-                        <button
-                            key={intent.value}
-                            type="button"
-                            className={`${styles.sliderOption} ${settings.rewriteIntent === intent.value ? styles.sliderOptionActive : ''}`}
-                            onClick={() => update({ rewriteIntent: intent.value })}
-                        >
-                            {intent.label}
-                        </button>
-                    ))}
+            {/* Voice DNA Toggle */}
+            {isLoggedIn && (
+                <div className={styles.voiceDnaSection}>
+                    {voiceDNAAvailable ? (
+                        <div className={styles.voiceDnaRow}>
+                            <span className={styles.voiceDnaLabel}>
+                                🧬 Voice DNA
+                            </span>
+                            <input
+                                type="checkbox"
+                                className={styles.toggle}
+                                checked={voiceDNAActive}
+                                onChange={e => onVoiceDNAToggle?.(e.target.checked)}
+                                aria-label="Toggle Voice DNA mode"
+                            />
+                        </div>
+                    ) : (
+                        <Link href="/voice" className={styles.voiceDnaSetupLink}>
+                            🧬 Set up Voice DNA →
+                        </Link>
+                    )}
+                    {voiceDNAActive && (
+                        <p className={styles.voiceDnaHint}>
+                            Voice DNA overrides tone presets — your personal style will be used
+                        </p>
+                    )}
                 </div>
-            </div>
+            )}
 
-            {/* Tone */}
-            <div className={styles.section}>
-                <span className={styles.sectionLabel}>Tone</span>
-                <p className={styles.sectionInfo}>{TONE_NOTES[settings.tone]}</p>
-                <div className={styles.toneGrid}>
-                    {TONES.map(t => (
-                        <button
-                            key={t.value}
-                            type="button"
-                            className={`${styles.tonePill} ${settings.tone === t.value ? styles.tonePillActive : ''}`}
-                            onClick={() => update({ tone: t.value })}
-                        >
-                            {t.emoji} {t.label}
-                        </button>
-                    ))}
-                </div>
-            </div>
+            <div style={{ opacity: controlsDimmed ? 0.4 : 1, pointerEvents: controlsDimmed ? 'none' : undefined, transition: 'opacity 0.2s' }}>
+                <PresetSelector preset={preset} onChange={onPresetChange} />
 
-            {/* Intensity */}
-            <div className={styles.section}>
-                <span className={styles.sectionLabel}>Intensity</span>
-                <p className={styles.sectionInfo}>{INTENSITY_NOTES[settings.intensity]}</p>
-                <div className={styles.sliderTrack}>
-                    {INTENSITIES.map(i => (
-                        <button
-                            key={i.value}
-                            type="button"
-                            className={`${styles.sliderOption} ${settings.intensity === i.value ? styles.sliderOptionActive : ''}`}
-                            onClick={() => update({ intensity: i.value })}
-                        >
-                            {i.label}
-                        </button>
-                    ))}
+                <div className={styles.section}>
+                    <span className={styles.sectionLabel}>Rewrite intent</span>
+                    <p className={styles.sectionInfo}>{INTENT_NOTES[settings.rewriteIntent]}</p>
+                    <div className={styles.sliderTrack}>
+                        {REWRITE_INTENTS.map(intent => (
+                            <button
+                                key={intent.value}
+                                type="button"
+                                className={`${styles.sliderOption} ${settings.rewriteIntent === intent.value ? styles.sliderOptionActive : ''}`}
+                                onClick={() => update({ rewriteIntent: intent.value })}
+                            >
+                                {intent.label}
+                            </button>
+                        ))}
+                    </div>
                 </div>
-            </div>
 
-            {/* Vocabulary */}
-            <div className={styles.section}>
-                <span className={styles.sectionLabel}>Vocabulary</span>
-                <p className={styles.sectionInfo}>{VOCAB_NOTES[settings.vocabLevel]}</p>
-                <div className={styles.vocabToggle}>
-                    {VOCAB_LEVELS.map(v => (
-                        <button
-                            key={v.value}
-                            type="button"
-                            className={`${styles.vocabOption} ${settings.vocabLevel === v.value ? styles.vocabOptionActive : ''}`}
-                            onClick={() => update({ vocabLevel: v.value })}
-                        >
-                            {v.label}
-                        </button>
-                    ))}
+                {/* Tone */}
+                <div className={styles.section}>
+                    <span className={styles.sectionLabel}>Tone</span>
+                    <p className={styles.sectionInfo}>{TONE_NOTES[settings.tone]}</p>
+                    <div className={styles.toneGrid}>
+                        {TONES.map(t => (
+                            <button
+                                key={t.value}
+                                type="button"
+                                className={`${styles.tonePill} ${settings.tone === t.value ? styles.tonePillActive : ''}`}
+                                onClick={() => update({ tone: t.value })}
+                            >
+                                {t.emoji} {t.label}
+                            </button>
+                        ))}
+                    </div>
                 </div>
-            </div>
 
-            {/* Preserve Length */}
-            <div className={styles.preserveRow}>
-                <span className={styles.preserveLabel}>Preserve length</span>
-                <input
-                    type="checkbox"
-                    className={styles.toggle}
-                    checked={settings.preserveLength}
-                    onChange={e => update({ preserveLength: e.target.checked })}
-                    aria-label="Preserve text length"
-                />
-            </div>
+                {/* Intensity */}
+                <div className={styles.section}>
+                    <span className={styles.sectionLabel}>Intensity</span>
+                    <p className={styles.sectionInfo}>{INTENSITY_NOTES[settings.intensity]}</p>
+                    <div className={styles.sliderTrack}>
+                        {INTENSITIES.map(i => (
+                            <button
+                                key={i.value}
+                                type="button"
+                                className={`${styles.sliderOption} ${settings.intensity === i.value ? styles.sliderOptionActive : ''}`}
+                                onClick={() => update({ intensity: i.value })}
+                            >
+                                {i.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
 
-            <div className={styles.previewPanel}>
-                <div className={styles.previewHeader}>
-                    <span className={styles.previewEyebrow}>Current direction</span>
-                    <span className={styles.previewBadge}>
-                        {selectedTone?.emoji} {selectedTone?.label}
-                    </span>
+                {/* Vocabulary */}
+                <div className={styles.section}>
+                    <span className={styles.sectionLabel}>Vocabulary</span>
+                    <p className={styles.sectionInfo}>{VOCAB_NOTES[settings.vocabLevel]}</p>
+                    <div className={styles.vocabToggle}>
+                        {VOCAB_LEVELS.map(v => (
+                            <button
+                                key={v.value}
+                                type="button"
+                                className={`${styles.vocabOption} ${settings.vocabLevel === v.value ? styles.vocabOptionActive : ''}`}
+                                onClick={() => update({ vocabLevel: v.value })}
+                            >
+                                {v.label}
+                            </button>
+                        ))}
+                    </div>
                 </div>
-                <p className={styles.previewText}>
-                    {INTENT_NOTES[settings.rewriteIntent]} {INTENSITY_NOTES[settings.intensity]} {VOCAB_NOTES[settings.vocabLevel]}
-                </p>
-                <div className={styles.previewMeta}>
-                    <span>{preset === 'none' ? 'No preset' : preset.replace('-', ' ')}</span>
-                    <span>{settings.rewriteIntent}</span>
-                    <span>{settings.intensity}</span>
-                    <span>{settings.vocabLevel}</span>
-                    <span>{settings.preserveLength ? 'Length locked' : 'Length flexible'}</span>
+
+                {/* Preserve Length */}
+                <div className={styles.preserveRow}>
+                    <span className={styles.preserveLabel}>Preserve length</span>
+                    <input
+                        type="checkbox"
+                        className={styles.toggle}
+                        checked={settings.preserveLength}
+                        onChange={e => update({ preserveLength: e.target.checked })}
+                        aria-label="Preserve text length"
+                    />
                 </div>
+
+                <div className={styles.previewPanel}>
+                    <div className={styles.previewHeader}>
+                        <span className={styles.previewEyebrow}>Current direction</span>
+                        <span className={styles.previewBadge}>
+                            {selectedTone?.emoji} {selectedTone?.label}
+                        </span>
+                    </div>
+                    <p className={styles.previewText}>
+                        {INTENT_NOTES[settings.rewriteIntent]} {INTENSITY_NOTES[settings.intensity]} {VOCAB_NOTES[settings.vocabLevel]}
+                    </p>
+                    <div className={styles.previewMeta}>
+                        <span>{preset === 'none' ? 'No preset' : preset.replace('-', ' ')}</span>
+                        <span>{settings.rewriteIntent}</span>
+                        <span>{settings.intensity}</span>
+                        <span>{settings.vocabLevel}</span>
+                        <span>{settings.preserveLength ? 'Length locked' : 'Length flexible'}</span>
+                    </div>
+                </div>
+
             </div>
 
             {/* Humanize Button */}
@@ -200,7 +242,7 @@ export default function ToneSelector({
                 id="humanize-btn"
             >
                 {loading && <span className={styles.loadingSpinner} />}
-                {loading ? 'Refining...' : '✨ Refine Text'}
+                {loading ? 'Refining...' : voiceDNAActive ? '🧬 Refine in My Voice' : '✨ Refine Text'}
             </button>
         </div>
     );

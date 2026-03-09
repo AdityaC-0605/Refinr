@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import type { VoiceMatchScore } from '@/lib/voice-types';
 import styles from './OutputPanel.module.css';
 
 export type ViewMode = 'output' | 'diff';
@@ -22,6 +23,7 @@ interface OutputPanelProps {
     readOnlyPreview?: boolean;
     outputContent?: React.ReactNode;
     showResultActions?: boolean;
+    voiceMatchScore?: VoiceMatchScore | null;
 }
 
 export default function OutputPanel({
@@ -41,9 +43,11 @@ export default function OutputPanel({
     readOnlyPreview = false,
     outputContent,
     showResultActions,
+    voiceMatchScore,
 }: OutputPanelProps) {
     const [copied, setCopied] = useState(false);
     const [downloaded, setDownloaded] = useState(false);
+    const [breakdownOpen, setBreakdownOpen] = useState(false);
 
     const handleCopy = async () => {
         if (!text) return;
@@ -220,6 +224,46 @@ export default function OutputPanel({
                 <div className={styles.ethicsTag}>
                     <span>🛡️</span>
                     AI-assisted edit — check your institution or employer&apos;s disclosure policies.
+                </div>
+            )}
+
+            {/* Voice Match Badge */}
+            {voiceMatchScore && shouldShowActions && !loading && (
+                <div className={styles.voiceMatchSection}>
+                    <button
+                        type="button"
+                        className={`${styles.voiceMatchBadge} ${voiceMatchScore.score >= 85 ? styles.voiceMatchHigh
+                                : voiceMatchScore.score >= 60 ? styles.voiceMatchMid
+                                    : styles.voiceMatchLow
+                            }`}
+                        onClick={() => setBreakdownOpen(!breakdownOpen)}
+                    >
+                        <span className={styles.voiceMatchIcon}>🧬</span>
+                        <span className={styles.voiceMatchLabel}>Voice Match</span>
+                        <span className={styles.voiceMatchValue}>{voiceMatchScore.score}%</span>
+                        <span className={styles.voiceMatchQuality}>
+                            {voiceMatchScore.score >= 85 ? 'Strong match ✓'
+                                : voiceMatchScore.score >= 60 ? 'Good match'
+                                    : 'Partial match'}
+                        </span>
+                    </button>
+
+                    {breakdownOpen && (
+                        <div className={styles.voiceBreakdown}>
+                            {voiceMatchScore.breakdown.map(item => (
+                                <div key={item.metric} className={styles.voiceBreakdownRow}>
+                                    <span className={styles.voiceBreakdownMetric}>{item.metric}</span>
+                                    <div className={styles.voiceBreakdownTrack}>
+                                        <div
+                                            className={styles.voiceBreakdownFill}
+                                            style={{ width: `${item.score}%` }}
+                                        />
+                                    </div>
+                                    <span className={styles.voiceBreakdownValue}>{item.score}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             )}
         </div>
