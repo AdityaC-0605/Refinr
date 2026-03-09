@@ -10,6 +10,8 @@ Refinr is an ethical AI writing assistant that transforms stiff, robotic AI-gene
 - 📝 **Format Presets**: Shape your output specifically for Emails, Blog Posts, Essays, or LinkedIn Posts.
 - ⚡ **Real-Time Streaming**: Watch your refined text generate in real-time with streaming AI responses.
 - 🔍 **Word-Level Diff & Explanations**: See exactly what changed with color-coded diffs, and read AI explanations for why each sentence was modified.
+- ✅ **Grammar Check**: Catch and resolve spelling, grammar, and stylistic errors with one-click inline replacements.
+- 🎯 **Tone Consistency Check**: Automatically flag sentences that stray from your target tone, with an option to selectively re-refine them.
 - 🔐 **Accounts & Document Storage**: Sign in via Firebase Authentication to save, view, and manage your previous document revisions.
 - 📊 **Readability Scoring**: Compare before/after Flesch-Kincaid grade levels and scores.
 - 🎨 **Premium UI**: Dark theme with glassmorphism, responsive design, interactive 3D tilt effects, and smooth page transitions.
