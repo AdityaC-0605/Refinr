@@ -413,6 +413,29 @@
     animation-delay: 0.16s;
 }
 
+.featureIconOrb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.2rem;
+    height: 3.2rem;
+    margin-bottom: 1rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.featureCard:hover .featureIconOrb {
+    transform: translateY(-3px) scale(1.06);
+    box-shadow: var(--shadow-md);
+}
+
+.featureEmoji {
+    font-size: 1.4rem;
+    line-height: 1;
+}
+
 .featureIndex {
     display: inline-flex;
     margin-bottom: 0.8rem;
@@ -1026,6 +1049,7 @@
 }
 
 @keyframes equalize {
+
     0%,
     100% {
         transform: scaleY(0.7);
@@ -1039,6 +1063,7 @@
 }
 
 @keyframes paragraphCursorBlink {
+
     0%,
     45% {
         opacity: 1;
@@ -1051,6 +1076,7 @@
 }
 
 @keyframes floatChip {
+
     0%,
     100% {
         transform: translate3d(0, 0, 0);
@@ -1062,6 +1088,7 @@
 }
 
 @media (max-width: 1100px) {
+
     .hero,
     .editorArea,
     .bottomPanels,

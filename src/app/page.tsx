@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/AuthProvider';
 import InteractiveTilt from '@/components/InteractiveTilt';
+import ScrollReveal from '@/components/ScrollReveal';
 import AnnotatedOutputText from '@/components/AnnotatedOutputText';
 import GrammarChecker from '@/components/GrammarChecker';
 import Header from '@/components/Header';
@@ -1353,279 +1354,300 @@ export default function Home() {
                     </div>
                 </section>
 
-                <section className={styles.featureStrip}>
-                    <InteractiveTilt className={styles.featureTilt} maxTilt={7}>
-                        <article className={styles.featureCard}>
-                            <span className={styles.featureIndex}>01</span>
-                            <h2 className={styles.featureTitle}>Sharper atmosphere</h2>
-                            <p className={styles.featureText}>
-                                A layered, cinematic workspace that feels like an editor’s instrument panel instead of a flat form.
-                            </p>
-                        </article>
-                    </InteractiveTilt>
-                    <InteractiveTilt className={styles.featureTilt} maxTilt={7}>
-                        <article className={styles.featureCard}>
-                            <span className={styles.featureIndex}>02</span>
-                            <h2 className={styles.featureTitle}>Tighter review loop</h2>
-                            <p className={styles.featureText}>
-                                Output, diff, readability, and change notes stay visually connected so the rewrite feels inspectable.
-                            </p>
-                        </article>
-                    </InteractiveTilt>
-                    <InteractiveTilt className={styles.featureTilt} maxTilt={7}>
-                        <article className={styles.featureCard}>
-                            <span className={styles.featureIndex}>03</span>
-                            <h2 className={styles.featureTitle}>Ethics still front and center</h2>
-                            <p className={styles.featureText}>
-                                The UI feels more premium now, but the core position remains transparent editing, not evasion.
-                            </p>
-                        </article>
-                    </InteractiveTilt>
-                </section>
+                <ScrollReveal>
+                    <section className={styles.featureStrip}>
+                        <ScrollReveal delay={0}>
+                            <InteractiveTilt className={styles.featureTilt} maxTilt={7}>
+                                <article className={styles.featureCard}>
+                                    <div className={styles.featureIconOrb} style={{ background: 'linear-gradient(135deg, rgba(255,179,107,0.2), rgba(255,138,76,0.08))' }}>
+                                        <span className={styles.featureEmoji}>🎨</span>
+                                    </div>
+                                    <span className={styles.featureIndex}>01</span>
+                                    <h2 className={styles.featureTitle}>Sharper atmosphere</h2>
+                                    <p className={styles.featureText}>
+                                        A layered, cinematic workspace that feels like an editor&apos;s instrument panel instead of a flat form.
+                                    </p>
+                                </article>
+                            </InteractiveTilt>
+                        </ScrollReveal>
+                        <ScrollReveal delay={120}>
+                            <InteractiveTilt className={styles.featureTilt} maxTilt={7}>
+                                <article className={styles.featureCard}>
+                                    <div className={styles.featureIconOrb} style={{ background: 'linear-gradient(135deg, rgba(116,227,255,0.2), rgba(47,196,234,0.08))' }}>
+                                        <span className={styles.featureEmoji}>🔍</span>
+                                    </div>
+                                    <span className={styles.featureIndex}>02</span>
+                                    <h2 className={styles.featureTitle}>Tighter review loop</h2>
+                                    <p className={styles.featureText}>
+                                        Output, diff, readability, and change notes stay visually connected so the rewrite feels inspectable.
+                                    </p>
+                                </article>
+                            </InteractiveTilt>
+                        </ScrollReveal>
+                        <ScrollReveal delay={240}>
+                            <InteractiveTilt className={styles.featureTilt} maxTilt={7}>
+                                <article className={styles.featureCard}>
+                                    <div className={styles.featureIconOrb} style={{ background: 'linear-gradient(135deg, rgba(73,212,160,0.2), rgba(73,212,160,0.08))' }}>
+                                        <span className={styles.featureEmoji}>🛡️</span>
+                                    </div>
+                                    <span className={styles.featureIndex}>03</span>
+                                    <h2 className={styles.featureTitle}>Ethics still front and center</h2>
+                                    <p className={styles.featureText}>
+                                        The UI feels more premium now, but the core position remains transparent editing, not evasion.
+                                    </p>
+                                </article>
+                            </InteractiveTilt>
+                        </ScrollReveal>
+                    </section>
+                </ScrollReveal>
 
                 {/* Toolbar - Tone Selector */}
-                <section className={styles.toolbarShell}>
-                    <div className={styles.toolbarHeading}>
-                        <div>
-                            <p className={styles.toolbarKicker}>Control board</p>
-                            <h2 className={styles.toolbarTitle}>Shape the rewrite before it happens</h2>
-                        </div>
-                        <div className={styles.toolbarSummary}>
-                            <span>{preset === 'none' ? 'manual' : preset.replace('-', ' ')}</span>
-                            <span>{settings.rewriteIntent}</span>
-                            <span>{settings.tone}</span>
-                            <span>{settings.intensity}</span>
-                            <span>{settings.vocabLevel}</span>
-                        </div>
-                    </div>
-                    <div className={styles.modeRow}>
-                        <div className={styles.modeInfo}>
-                            <span className={styles.modeLabel}>Paragraph Mode</span>
-                            <p className={styles.modeText}>Refine each paragraph independently while keeping the current tone, preset, and vocabulary controls.</p>
-                        </div>
-                        <button
-                            type="button"
-                            className={`${styles.modeToggle} ${paragraphMode ? styles.modeToggleActive : ''}`}
-                            onClick={handleParagraphModeChange}
-                            aria-pressed={paragraphMode}
-                        >
-                            {paragraphMode ? 'On' : 'Off'}
-                        </button>
-                    </div>
-                    {versionPreviewLabel && (
-                        <div className={styles.versionPreviewBanner}>
+                <ScrollReveal distance={40}>
+                    <section className={styles.toolbarShell}>
+                        <div className={styles.toolbarHeading}>
                             <div>
-                                <span className={styles.versionPreviewEyebrow}>Read-only preview</span>
-                                <p className={styles.versionPreviewText}>{versionPreviewLabel}</p>
+                                <p className={styles.toolbarKicker}>Control board</p>
+                                <h2 className={styles.toolbarTitle}>Shape the rewrite before it happens</h2>
+                            </div>
+                            <div className={styles.toolbarSummary}>
+                                <span>{preset === 'none' ? 'manual' : preset.replace('-', ' ')}</span>
+                                <span>{settings.rewriteIntent}</span>
+                                <span>{settings.tone}</span>
+                                <span>{settings.intensity}</span>
+                                <span>{settings.vocabLevel}</span>
+                            </div>
+                        </div>
+                        <div className={styles.modeRow}>
+                            <div className={styles.modeInfo}>
+                                <span className={styles.modeLabel}>Paragraph Mode</span>
+                                <p className={styles.modeText}>Refine each paragraph independently while keeping the current tone, preset, and vocabulary controls.</p>
                             </div>
                             <button
                                 type="button"
-                                className={styles.versionPreviewButton}
-                                onClick={handleEditVersion}
+                                className={`${styles.modeToggle} ${paragraphMode ? styles.modeToggleActive : ''}`}
+                                onClick={handleParagraphModeChange}
+                                aria-pressed={paragraphMode}
                             >
-                                Edit this version
+                                {paragraphMode ? 'On' : 'Off'}
                             </button>
                         </div>
-                    )}
-                    <div className={styles.toolbar}>
-                        <button
-                            type="button"
-                            className={styles.toolbarToggle}
-                            onClick={() => setToolbarOpen(!toolbarOpen)}
-                        >
-                            {toolbarOpen ? '▲' : '▼'} Settings — {settings.rewriteIntent} · {settings.tone} · {settings.intensity}
-                        </button>
-                        <div className={`${styles.toolbarContent} ${toolbarOpen ? styles.toolbarContentOpen : ''}`}>
-                            <ToneSelector
-                                preset={preset}
-                                settings={settings}
-                                onPresetChange={handlePresetChange}
-                                onChange={setSettings}
-                                onHumanize={handleHumanize}
-                                loading={loading}
-                                disabled={isDisabled}
-                                voiceDNAAvailable={voiceDNAAvailable}
-                                voiceDNAActive={voiceDNAActive}
-                                onVoiceDNAToggle={setVoiceDNAActive}
-                                isLoggedIn={!!user}
-                            />
+                        {versionPreviewLabel && (
+                            <div className={styles.versionPreviewBanner}>
+                                <div>
+                                    <span className={styles.versionPreviewEyebrow}>Read-only preview</span>
+                                    <p className={styles.versionPreviewText}>{versionPreviewLabel}</p>
+                                </div>
+                                <button
+                                    type="button"
+                                    className={styles.versionPreviewButton}
+                                    onClick={handleEditVersion}
+                                >
+                                    Edit this version
+                                </button>
+                            </div>
+                        )}
+                        <div className={styles.toolbar}>
+                            <button
+                                type="button"
+                                className={styles.toolbarToggle}
+                                onClick={() => setToolbarOpen(!toolbarOpen)}
+                            >
+                                {toolbarOpen ? '▲' : '▼'} Settings — {settings.rewriteIntent} · {settings.tone} · {settings.intensity}
+                            </button>
+                            <div className={`${styles.toolbarContent} ${toolbarOpen ? styles.toolbarContentOpen : ''}`}>
+                                <ToneSelector
+                                    preset={preset}
+                                    settings={settings}
+                                    onPresetChange={handlePresetChange}
+                                    onChange={setSettings}
+                                    onHumanize={handleHumanize}
+                                    loading={loading}
+                                    disabled={isDisabled}
+                                    voiceDNAAvailable={voiceDNAAvailable}
+                                    voiceDNAActive={voiceDNAActive}
+                                    onVoiceDNAToggle={setVoiceDNAActive}
+                                    isLoggedIn={!!user}
+                                />
+                            </div>
+                            <div className={styles.toolbarDesktop}>
+                                <ToneSelector
+                                    preset={preset}
+                                    settings={settings}
+                                    onPresetChange={handlePresetChange}
+                                    onChange={setSettings}
+                                    onHumanize={handleHumanize}
+                                    loading={loading}
+                                    disabled={isDisabled}
+                                    voiceDNAAvailable={voiceDNAAvailable}
+                                    voiceDNAActive={voiceDNAActive}
+                                    onVoiceDNAToggle={setVoiceDNAActive}
+                                    isLoggedIn={!!user}
+                                />
+                            </div>
+                            {versionPreviewLabel && <div className={styles.toolbarOverlay} aria-hidden="true" />}
                         </div>
-                        <div className={styles.toolbarDesktop}>
-                            <ToneSelector
-                                preset={preset}
-                                settings={settings}
-                                onPresetChange={handlePresetChange}
-                                onChange={setSettings}
-                                onHumanize={handleHumanize}
-                                loading={loading}
-                                disabled={isDisabled}
-                                voiceDNAAvailable={voiceDNAAvailable}
-                                voiceDNAActive={voiceDNAActive}
-                                onVoiceDNAToggle={setVoiceDNAActive}
-                                isLoggedIn={!!user}
-                            />
-                        </div>
-                        {versionPreviewLabel && <div className={styles.toolbarOverlay} aria-hidden="true" />}
-                    </div>
-                </section>
+                    </section>
+                </ScrollReveal>
 
                 {/* Editor Split Pane */}
-                <div className={styles.editorShell} id="editor">
-                    <div className={styles.editorShellHeader}>
-                        <div>
-                            <p className={styles.editorShellKicker}>Workspace</p>
-                            <h2 className={styles.editorShellTitle}>Draft on the left, refined prose on the right</h2>
+                <ScrollReveal distance={36}>
+                    <div className={styles.editorShell} id="editor">
+                        <div className={styles.editorShellHeader}>
+                            <div>
+                                <p className={styles.editorShellKicker}>Workspace</p>
+                                <h2 className={styles.editorShellTitle}>Draft on the left, refined prose on the right</h2>
+                            </div>
+                            <p className={styles.editorShellText}>
+                                Upload rough text, run the pass, then review every change with output actions and readability context.
+                            </p>
                         </div>
-                        <p className={styles.editorShellText}>
-                            Upload rough text, run the pass, then review every change with output actions and readability context.
-                        </p>
-                    </div>
-                    <div className={styles.editorArea}>
-                        <div className={styles.inputPane}>
-                            {paragraphMode ? (
-                                <div className={styles.paragraphEditor}>
-                                    <div className={styles.paragraphEditorHeader}>
-                                        <div>
-                                            <span className={styles.paragraphEditorEyebrow}>Paragraph controls</span>
-                                            <p className={styles.paragraphEditorText}>
-                                                Refine individual blocks or run the whole document sequentially with a short delay between calls.
-                                            </p>
+                        <div className={styles.editorArea}>
+                            <div className={styles.inputPane}>
+                                {paragraphMode ? (
+                                    <div className={styles.paragraphEditor}>
+                                        <div className={styles.paragraphEditorHeader}>
+                                            <div>
+                                                <span className={styles.paragraphEditorEyebrow}>Paragraph controls</span>
+                                                <p className={styles.paragraphEditorText}>
+                                                    Refine individual blocks or run the whole document sequentially with a short delay between calls.
+                                                </p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                className={styles.paragraphRefineAll}
+                                                onClick={() => void handleRefineAllParagraphs()}
+                                                disabled={!canRunParagraphMode || loading || !!versionPreviewLabel}
+                                            >
+                                                {loading ? 'Refining...' : 'Refine All'}
+                                            </button>
                                         </div>
-                                        <button
-                                            type="button"
-                                            className={styles.paragraphRefineAll}
-                                            onClick={() => void handleRefineAllParagraphs()}
-                                            disabled={!canRunParagraphMode || loading || !!versionPreviewLabel}
-                                        >
-                                            {loading ? 'Refining...' : 'Refine All'}
-                                        </button>
-                                    </div>
 
-                                    {error && <div className={styles.paragraphAlert}>{error}</div>}
+                                        {error && <div className={styles.paragraphAlert}>{error}</div>}
 
-                                    {paragraphInputList.length === 0 ? (
-                                        <div className={styles.paragraphEmptyState}>
-                                            Add some text to split it into paragraph cards.
-                                        </div>
-                                    ) : (
-                                        <div className={styles.paragraphList}>
-                                            {paragraphInputList.map((paragraph, index) => (
-                                                <article key={`input-${index}`} className={styles.paragraphCard}>
-                                                    <div className={styles.paragraphCardHeader}>
-                                                        <span className={styles.paragraphCardLabel}>Paragraph {index + 1}</span>
-                                                        <button
-                                                            type="button"
-                                                            className={styles.paragraphRefineOne}
-                                                            onClick={() => void handleRefineSingleParagraph(index)}
-                                                            disabled={loading || !!versionPreviewLabel || !paragraph.trim()}
-                                                            aria-label={`Refine paragraph ${index + 1}`}
-                                                        >
-                                                            ✨
-                                                        </button>
-                                                    </div>
-                                                    <textarea
-                                                        className={styles.paragraphTextarea}
-                                                        value={paragraph}
-                                                        onChange={event => handleParagraphInputChange(index, event.target.value)}
-                                                        disabled={loading || !!versionPreviewLabel}
-                                                    />
-                                                </article>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <TextEditor
-                                    value={inputText}
-                                    onChange={setInputText}
-                                    disabled={loading || !!versionPreviewLabel}
-                                />
-                            )}
-                        </div>
-                        <div className={styles.outputPane}>
-                            <OutputPanel
-                                text={paragraphMode ? (result?.editedText || '') : result?.editedText || streamingText}
-                                loading={loading}
-                                error={paragraphMode && paragraphInputList.length > 0 ? null : error}
-                                viewMode={viewMode}
-                                onViewModeChange={setViewMode}
-                                hasResult={paragraphMode ? paragraphInputList.length > 0 : !!result || streamingText.length > 0}
-                                showResultActions={paragraphMode ? !!result : undefined}
-                                onUseAsInput={handleUseResultAsInput}
-                                onSaveDocument={result ? handleSaveDocument : undefined}
-                                saveStatus={saveStatus}
-                                onUndo={handleUndo}
-                                canUndo={undoStackRef.current.length > 0}
-                                readOnlyPreview={!!versionPreviewLabel}
-                                outputContent={paragraphMode ? paragraphOutputContent : annotatedOutputContent}
-                                showStreamingCursor={loading && streamingText.length > 0}
-                                voiceMatchScore={voiceDNAActive ? voiceMatchScore : null}
-                                diffContent={
-                                    result ? (
-                                        <div className={styles.diffPane}>
-                                            <div className={styles.diffControls}>
-                                                <div className={styles.diffControlsPrimary}>
-                                                    <button
-                                                        type="button"
-                                                        className={`${styles.diffToggle} ${showExplanations ? styles.diffToggleActive : ''}`}
-                                                        onClick={() => setShowExplanations(prev => !prev)}
-                                                        aria-pressed={showExplanations}
-                                                    >
-                                                        {showExplanations ? 'Hide Explanations' : 'Show Explanations'}
-                                                    </button>
-                                                    {showExplanations && explanationsLoading && !explanationsDisabled && (
-                                                        <span className={styles.diffStatus}>Generating explanations...</span>
-                                                    )}
-                                                </div>
-                                                {reviewSummary.total > 0 && !versionPreviewLabel && (
-                                                    <div className={styles.reviewToolbar}>
-                                                        <span className={styles.reviewSummary}>
-                                                            {reviewSummary.accepted} kept · {reviewSummary.rejected} reverted · {reviewSummary.pending} pending
-                                                        </span>
-                                                        <div className={styles.reviewToolbarActions}>
+                                        {paragraphInputList.length === 0 ? (
+                                            <div className={styles.paragraphEmptyState}>
+                                                Add some text to split it into paragraph cards.
+                                            </div>
+                                        ) : (
+                                            <div className={styles.paragraphList}>
+                                                {paragraphInputList.map((paragraph, index) => (
+                                                    <article key={`input-${index}`} className={styles.paragraphCard}>
+                                                        <div className={styles.paragraphCardHeader}>
+                                                            <span className={styles.paragraphCardLabel}>Paragraph {index + 1}</span>
                                                             <button
                                                                 type="button"
-                                                                className={styles.reviewToolbarButton}
-                                                                onClick={() => handleReviewDecisionBatch('accepted')}
-                                                                disabled={reviewSummary.pending === 0 && reviewSummary.rejected === 0}
+                                                                className={styles.paragraphRefineOne}
+                                                                onClick={() => void handleRefineSingleParagraph(index)}
+                                                                disabled={loading || !!versionPreviewLabel || !paragraph.trim()}
+                                                                aria-label={`Refine paragraph ${index + 1}`}
                                                             >
-                                                                Keep all
-                                                            </button>
-                                                            <button
-                                                                type="button"
-                                                                className={styles.reviewToolbarButton}
-                                                                onClick={() => handleReviewDecisionBatch('rejected')}
-                                                                disabled={reviewSummary.pending === 0 && reviewSummary.accepted === 0}
-                                                            >
-                                                                Revert all
-                                                            </button>
-                                                            <button
-                                                                type="button"
-                                                                className={styles.reviewToolbarButton}
-                                                                onClick={handleResetReview}
-                                                                disabled={reviewSummary.accepted === 0 && reviewSummary.rejected === 0}
-                                                            >
-                                                                Reset review
+                                                                ✨
                                                             </button>
                                                         </div>
-                                                    </div>
-                                                )}
+                                                        <textarea
+                                                            className={styles.paragraphTextarea}
+                                                            value={paragraph}
+                                                            onChange={event => handleParagraphInputChange(index, event.target.value)}
+                                                            disabled={loading || !!versionPreviewLabel}
+                                                        />
+                                                    </article>
+                                                ))}
                                             </div>
-                                            <DiffView
-                                                original={originalText}
-                                                edited={diffComparisonEditedText}
-                                                explanations={showExplanations && !explanationsDisabled ? explanations : []}
-                                                showExplanations={showExplanations && !explanationsDisabled}
-                                                reviewDecisions={reviewDecisions}
-                                                onReviewDecision={!versionPreviewLabel ? handleReviewDecision : undefined}
-                                            />
-                                        </div>
-                                    ) : undefined
-                                }
-                            />
+                                        )}
+                                    </div>
+                                ) : (
+                                    <TextEditor
+                                        value={inputText}
+                                        onChange={setInputText}
+                                        disabled={loading || !!versionPreviewLabel}
+                                    />
+                                )}
+                            </div>
+                            <div className={styles.outputPane}>
+                                <OutputPanel
+                                    text={paragraphMode ? (result?.editedText || '') : result?.editedText || streamingText}
+                                    loading={loading}
+                                    error={paragraphMode && paragraphInputList.length > 0 ? null : error}
+                                    viewMode={viewMode}
+                                    onViewModeChange={setViewMode}
+                                    hasResult={paragraphMode ? paragraphInputList.length > 0 : !!result || streamingText.length > 0}
+                                    showResultActions={paragraphMode ? !!result : undefined}
+                                    onUseAsInput={handleUseResultAsInput}
+                                    onSaveDocument={result ? handleSaveDocument : undefined}
+                                    saveStatus={saveStatus}
+                                    onUndo={handleUndo}
+                                    canUndo={undoStackRef.current.length > 0}
+                                    readOnlyPreview={!!versionPreviewLabel}
+                                    outputContent={paragraphMode ? paragraphOutputContent : annotatedOutputContent}
+                                    showStreamingCursor={loading && streamingText.length > 0}
+                                    voiceMatchScore={voiceDNAActive ? voiceMatchScore : null}
+                                    diffContent={
+                                        result ? (
+                                            <div className={styles.diffPane}>
+                                                <div className={styles.diffControls}>
+                                                    <div className={styles.diffControlsPrimary}>
+                                                        <button
+                                                            type="button"
+                                                            className={`${styles.diffToggle} ${showExplanations ? styles.diffToggleActive : ''}`}
+                                                            onClick={() => setShowExplanations(prev => !prev)}
+                                                            aria-pressed={showExplanations}
+                                                        >
+                                                            {showExplanations ? 'Hide Explanations' : 'Show Explanations'}
+                                                        </button>
+                                                        {showExplanations && explanationsLoading && !explanationsDisabled && (
+                                                            <span className={styles.diffStatus}>Generating explanations...</span>
+                                                        )}
+                                                    </div>
+                                                    {reviewSummary.total > 0 && !versionPreviewLabel && (
+                                                        <div className={styles.reviewToolbar}>
+                                                            <span className={styles.reviewSummary}>
+                                                                {reviewSummary.accepted} kept · {reviewSummary.rejected} reverted · {reviewSummary.pending} pending
+                                                            </span>
+                                                            <div className={styles.reviewToolbarActions}>
+                                                                <button
+                                                                    type="button"
+                                                                    className={styles.reviewToolbarButton}
+                                                                    onClick={() => handleReviewDecisionBatch('accepted')}
+                                                                    disabled={reviewSummary.pending === 0 && reviewSummary.rejected === 0}
+                                                                >
+                                                                    Keep all
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    className={styles.reviewToolbarButton}
+                                                                    onClick={() => handleReviewDecisionBatch('rejected')}
+                                                                    disabled={reviewSummary.pending === 0 && reviewSummary.accepted === 0}
+                                                                >
+                                                                    Revert all
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    className={styles.reviewToolbarButton}
+                                                                    onClick={handleResetReview}
+                                                                    disabled={reviewSummary.accepted === 0 && reviewSummary.rejected === 0}
+                                                                >
+                                                                    Reset review
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <DiffView
+                                                    original={originalText}
+                                                    edited={diffComparisonEditedText}
+                                                    explanations={showExplanations && !explanationsDisabled ? explanations : []}
+                                                    showExplanations={showExplanations && !explanationsDisabled}
+                                                    reviewDecisions={reviewDecisions}
+                                                    onReviewDecision={!versionPreviewLabel ? handleReviewDecision : undefined}
+                                                />
+                                            </div>
+                                        ) : undefined
+                                    }
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
+                </ScrollReveal>
 
                 {/* Bottom Panels: Readability + Change Summary */}
                 {result && (
