@@ -1,3 +1,5 @@
+import { MAX_INPUT_CHARACTERS, MAX_INPUT_WORDS, MIN_INPUT_WORDS } from './config.ts';
+
 /**
  * Input sanitization utilities
  */
@@ -41,17 +43,24 @@ export function validateInput(text: string): ValidationResult {
     const clean = sanitizeInput(text);
     const words = countWords(clean);
 
-    if (words < 10) {
+    if (words < MIN_INPUT_WORDS) {
         return {
             valid: false,
-            error: `Please enter at least 10 words. Current: ${words} word${words !== 1 ? 's' : ''}.`,
+            error: `Please enter at least ${MIN_INPUT_WORDS} words. Current: ${words} word${words !== 1 ? 's' : ''}.`,
         };
     }
 
-    if (words > 5000) {
+    if (words > MAX_INPUT_WORDS) {
         return {
             valid: false,
-            error: `Maximum 5,000 words per request. Current: ${words.toLocaleString()} words.`,
+            error: `Maximum ${MAX_INPUT_WORDS.toLocaleString()} words per request. Current: ${words.toLocaleString()} words.`,
+        };
+    }
+
+    if (clean.length > MAX_INPUT_CHARACTERS) {
+        return {
+            valid: false,
+            error: `Maximum ${MAX_INPUT_CHARACTERS.toLocaleString()} characters per request. Current: ${clean.length.toLocaleString()} characters.`,
         };
     }
 
