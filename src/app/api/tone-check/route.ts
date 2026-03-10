@@ -1,28 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-import { MAX_INPUT_CHARACTERS, RATE_LIMIT_REQUESTS, RATE_LIMIT_WINDOW_MS } from '@/lib/config';
+import { MAX_INPUT_CHARACTERS } from '@/lib/config';
+import { createRateLimiter } from '@/lib/rate-limit';
 import { getClientIpFromHeaders, isRetryableError, MODELS_TO_TRY } from '@/lib/humanize';
 import { sanitizeInput } from '@/lib/sanitize';
 import type { ToneCheckFinding } from '@/lib/output-checks';
 
-const toneCheckRateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-function checkRateLimit(ip: string): boolean {
-    const now = Date.now();
-    const entry = toneCheckRateLimitMap.get(ip);
-
-    if (!entry || now > entry.resetAt) {
-        toneCheckRateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-        return true;
-    }
-
-    if (entry.count >= RATE_LIMIT_REQUESTS) {
-        return false;
-    }
-
-    entry.count += 1;
-    return true;
-}
+const checkRateLimit = createRateLimiter();
 
 function stripCodeFences(text: string): string {
     const trimmed = text.trim();

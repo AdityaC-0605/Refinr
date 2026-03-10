@@ -6,6 +6,7 @@ import {
     StoredDocumentVersion,
     deriveDocumentTitle,
 } from './documents.ts';
+import { toIsoString } from './timestamp.ts';
 
 const E2E_TEST_USER_ID = 'e2e-user';
 const E2E_FIXTURE_DOCUMENTS: StoredDocument[] = [
@@ -108,22 +109,6 @@ interface FirestoreVersionRecord {
     intensity?: StoredDocumentVersion['intensity'];
     vocabLevel?: StoredDocumentVersion['vocabLevel'];
     createdAt?: Timestamp | Date | string;
-}
-
-function toIsoString(value: Timestamp | Date | string | undefined): string {
-    if (value instanceof Timestamp) {
-        return value.toDate().toISOString();
-    }
-
-    if (value instanceof Date) {
-        return value.toISOString();
-    }
-
-    if (typeof value === 'string' && value.length > 0) {
-        return value;
-    }
-
-    return new Date().toISOString();
 }
 
 function mapDocumentRecord(id: string, record: FirestoreDocumentRecord): StoredDocument {

@@ -17,11 +17,6 @@ export interface ParsedHumanizeResponse {
     change_summary: string[];
 }
 
-export interface StreamCompletePayload {
-    edited_text: string;
-    change_summary: string[];
-}
-
 export interface ChangeExplanation {
     original: string;
     revised: string;

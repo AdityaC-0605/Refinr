@@ -1,6 +1,7 @@
 import { Timestamp } from 'firebase-admin/firestore';
 import { getFirebaseAdminDb } from './firebase-admin.ts';
 import type { VoiceDNAProfile } from './voice-types.ts';
+import { toIsoString } from './timestamp.ts';
 
 const profileCache = new Map<string, VoiceDNAProfile>();
 
@@ -13,22 +14,6 @@ interface FirestoreProfileRecord {
     statistical?: VoiceDNAProfile['statistical'];
     qualitative?: VoiceDNAProfile['qualitative'];
     promptFragment?: string;
-}
-
-function toIsoString(value: Timestamp | Date | string | undefined): string {
-    if (value instanceof Timestamp) {
-        return value.toDate().toISOString();
-    }
-
-    if (value instanceof Date) {
-        return value.toISOString();
-    }
-
-    if (typeof value === 'string' && value.length > 0) {
-        return value;
-    }
-
-    return new Date().toISOString();
 }
 
 function mapProfileRecord(record: FirestoreProfileRecord, userId: string): VoiceDNAProfile | null {

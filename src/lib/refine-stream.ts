@@ -102,12 +102,20 @@ export async function streamRefinementRequest(payload: {
 
             const parsedEvent = parseSseEvent(rawEvent);
             if (parsedEvent) {
-                const eventPayload = JSON.parse(parsedEvent.data) as {
+                let eventPayload: {
                     text?: string;
                     error?: string;
                     edited_text?: string;
                     change_summary?: string[];
                 };
+
+                try {
+                    eventPayload = JSON.parse(parsedEvent.data) as typeof eventPayload;
+                } catch {
+                    // Skip malformed SSE data payloads
+                    boundaryIndex = rawBuffer.indexOf('\n\n');
+                    continue;
+                }
 
                 if (parsedEvent.event === 'chunk' && typeof eventPayload.text === 'string') {
                     flushStreamingDelta(eventPayload.text);
