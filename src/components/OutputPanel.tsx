@@ -56,15 +56,7 @@ export default function OutputPanel({
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch {
-            // Fallback for older browsers
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
+            // Ignore errors if clipboard permissions are denied
         }
     };
 
@@ -233,8 +225,8 @@ export default function OutputPanel({
                     <button
                         type="button"
                         className={`${styles.voiceMatchBadge} ${voiceMatchScore.score >= 85 ? styles.voiceMatchHigh
-                                : voiceMatchScore.score >= 60 ? styles.voiceMatchMid
-                                    : styles.voiceMatchLow
+                            : voiceMatchScore.score >= 60 ? styles.voiceMatchMid
+                                : styles.voiceMatchLow
                             }`}
                         onClick={() => setBreakdownOpen(!breakdownOpen)}
                     >

@@ -16,9 +16,9 @@ import {
     DEFAULT_REWRITE_PRESET,
     isValidHumanizeSettings,
     isValidRewritePreset,
-    RATE_LIMIT_REQUESTS,
-    RATE_LIMIT_WINDOW_MS,
 } from '@/lib/config';
+import { createRateLimiter } from '@/lib/rate-limit';
+import { getPublicErrorMessage } from '@/lib/api-errors';
 import {
     assessRewriteQuality,
     chooseBetterRewrite,
@@ -30,7 +30,7 @@ import {
     MODELS_TO_TRY,
     shouldGenerateAlternativeRewrite,
     shouldRunPolishPassWithSettings,
-    StreamCompletePayload,
+    ParsedHumanizeResponse,
 } from '@/lib/humanize';
 import { sanitizeInput, validateInput } from '@/lib/sanitize';
 import { getSessionUserFromCookies } from '@/lib/firebase-admin';
@@ -38,45 +38,10 @@ import { loadVoiceProfile } from '@/lib/voice-store';
 import { computeVoiceMatchScore } from '@/lib/voice-scoring';
 import type { VoiceMatchScore } from '@/lib/voice-types';
 
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-function checkRateLimit(ip: string): boolean {
-    const now = Date.now();
-    const entry = rateLimitMap.get(ip);
-
-    if (!entry || now > entry.resetAt) {
-        rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-        return true;
-    }
-
-    if (entry.count >= RATE_LIMIT_REQUESTS) {
-        return false;
-    }
-
-    entry.count++;
-    return true;
-}
+const checkRateLimit = createRateLimiter();
 
 function createSseMessage(event: string, data: unknown): string {
     return `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
-}
-
-function getPublicErrorMessage(error: unknown): string {
-    const message = error instanceof Error ? error.message : 'An unexpected error occurred';
-
-    if (message.includes('API_KEY_INVALID') || message.includes('API key not valid')) {
-        return 'Invalid Gemini API key. Please check your GEMINI_API_KEY in .env.local';
-    }
-
-    if (message.includes('RESOURCE_EXHAUSTED') || message.includes('quota') || message.includes('429')) {
-        return 'All model quotas exhausted. Please wait a few minutes and try again.';
-    }
-
-    if (message.includes('503') || message.includes('high demand') || message.includes('Service Unavailable')) {
-        return 'All models are currently experiencing high demand. Please try again in a moment.';
-    }
-
-    return 'Failed to process your text. Please try again.';
 }
 
 export async function POST(request: NextRequest) {
@@ -321,7 +286,7 @@ export async function POST(request: NextRequest) {
                         }
                     }
 
-                    const payload: StreamCompletePayload & { voiceMatchScore?: VoiceMatchScore } = {
+                    const payload: ParsedHumanizeResponse & { voiceMatchScore?: VoiceMatchScore } = {
                         edited_text: cleanedEditedText,
                         change_summary: generateChangeSummary(cleanText, cleanedEditedText),
                     };

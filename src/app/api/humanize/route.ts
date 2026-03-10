@@ -15,9 +15,9 @@ import {
     DEFAULT_REWRITE_PRESET,
     isValidHumanizeSettings,
     isValidRewritePreset,
-    RATE_LIMIT_REQUESTS,
-    RATE_LIMIT_WINDOW_MS,
 } from '@/lib/config';
+import { createRateLimiter } from '@/lib/rate-limit';
+import { getPublicErrorMessage } from '@/lib/api-errors';
 import {
     assessRewriteQuality,
     chooseBetterRewrite,
@@ -30,25 +30,7 @@ import {
 } from '@/lib/humanize';
 import { sanitizeInput, validateInput } from '@/lib/sanitize';
 
-// Simple in-memory rate limiter for MVP
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-function checkRateLimit(ip: string): boolean {
-    const now = Date.now();
-    const entry = rateLimitMap.get(ip);
-
-    if (!entry || now > entry.resetAt) {
-        rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-        return true;
-    }
-
-    if (entry.count >= RATE_LIMIT_REQUESTS) {
-        return false;
-    }
-
-    entry.count++;
-    return true;
-}
+const checkRateLimit = createRateLimiter();
 
 export async function POST(request: NextRequest) {
     try {
@@ -275,27 +257,27 @@ export async function POST(request: NextRequest) {
         // Check for common Gemini API errors
         if (message.includes('API_KEY_INVALID') || message.includes('API key not valid')) {
             return NextResponse.json(
-                { error: 'Invalid Gemini API key. Please check your GEMINI_API_KEY in .env.local' },
+                { error: getPublicErrorMessage(error) },
                 { status: 401 }
             );
         }
 
         if (message.includes('RESOURCE_EXHAUSTED') || message.includes('quota') || message.includes('429')) {
             return NextResponse.json(
-                { error: 'All model quotas exhausted. Please wait a few minutes and try again.' },
+                { error: getPublicErrorMessage(error) },
                 { status: 429 }
             );
         }
 
         if (message.includes('503') || message.includes('high demand') || message.includes('Service Unavailable')) {
             return NextResponse.json(
-                { error: 'All models are currently experiencing high demand. Please try again in a moment.' },
+                { error: getPublicErrorMessage(error) },
                 { status: 503 }
             );
         }
 
         return NextResponse.json(
-            { error: 'Failed to process your text. Please try again.' },
+            { error: getPublicErrorMessage(error) },
             { status: 500 }
         );
     }

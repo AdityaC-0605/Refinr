@@ -13,46 +13,11 @@ import {
 import { sanitizeInput } from '@/lib/sanitize';
 import {
     MAX_INPUT_CHARACTERS,
-    RATE_LIMIT_REQUESTS,
-    RATE_LIMIT_WINDOW_MS,
 } from '@/lib/config';
+import { createRateLimiter } from '@/lib/rate-limit';
+import { getPublicErrorMessage } from '@/lib/api-errors';
 
-const explanationRateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-function checkRateLimit(ip: string): boolean {
-    const now = Date.now();
-    const entry = explanationRateLimitMap.get(ip);
-
-    if (!entry || now > entry.resetAt) {
-        explanationRateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-        return true;
-    }
-
-    if (entry.count >= RATE_LIMIT_REQUESTS) {
-        return false;
-    }
-
-    entry.count += 1;
-    return true;
-}
-
-function getPublicErrorMessage(error: unknown): string {
-    const message = error instanceof Error ? error.message : 'An unexpected error occurred';
-
-    if (message.includes('API_KEY_INVALID') || message.includes('API key not valid')) {
-        return 'Invalid Gemini API key. Please check your GEMINI_API_KEY in .env.local';
-    }
-
-    if (message.includes('RESOURCE_EXHAUSTED') || message.includes('quota') || message.includes('429')) {
-        return 'All model quotas exhausted. Please wait a few minutes and try again.';
-    }
-
-    if (message.includes('503') || message.includes('high demand') || message.includes('Service Unavailable')) {
-        return 'All models are currently experiencing high demand. Please try again in a moment.';
-    }
-
-    return 'Failed to generate explanations.';
-}
+const checkRateLimit = createRateLimiter();
 
 export async function POST(request: NextRequest) {
     try {
@@ -150,7 +115,7 @@ export async function POST(request: NextRequest) {
         console.error('Refinr explanation API error:', error);
 
         return NextResponse.json(
-            { error: getPublicErrorMessage(error) },
+            { error: getPublicErrorMessage(error, 'Failed to generate explanations.') },
             { status: 500 }
         );
     }
